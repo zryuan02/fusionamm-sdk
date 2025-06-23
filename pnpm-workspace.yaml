@@ -1,0 +1,4 @@
+packages:
+  - "programs/*"
+  - "rust-sdk/*"
+  - "ts-sdk/*"

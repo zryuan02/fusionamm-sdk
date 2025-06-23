@@ -1,0 +1,65 @@
+{
+  "name": "@crypticdot/fusionamm-sdk",
+  "version": "1.0.49",
+  "description": "High-level typescript sdk to interact with on-chain FusionAMM program.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap",
+    "test": "vitest run tests",
+    "deploy": "../../scripts/deploy-npm",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@crypticdot/fusionamm-client": "workspace:*",
+    "@crypticdot/fusionamm-core": "workspace:*",
+    "@solana-program/memo": "^0.7.0",
+    "@solana-program/system": "^0.7.0",
+    "@solana-program/token": "^0.5.1",
+    "@solana-program/token-2022": "^0.4.0",
+    "@solana/sysvars": "^2.1.0"
+  },
+  "peerDependencies": {
+    "@solana/kit": "^2.1.0"
+  },
+  "devDependencies": {
+    "@defituna/eslint-config": "^0.4.0",
+    "@defituna/prettier-config": "^0.0.0",
+    "@solana/kit": "^2.1.0",
+    "solana-bankrun": "^0.4.0",
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DefiTuna/fusionamm.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "solana",
+    "crypto",
+    "defi",
+    "dex",
+    "amm"
+  ],
+  "homepage": "https://fusionamm.com"
+}

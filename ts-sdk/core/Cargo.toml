@@ -1,0 +1,18 @@
+[package]
+name = "fusionamm-core_js_bindings"
+version = "1.0.3"
+publish = false
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+fusionamm-core = { path = "../../rust-sdk/core", features = ["wasm", "floats"] }
+
+[profile.release]
+opt-level = "s"
+strip = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["--enable-bulk-memory", "--enable-nontrapping-float-to-int"]

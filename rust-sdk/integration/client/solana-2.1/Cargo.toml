@@ -1,0 +1,10 @@
+[package]
+name = "fusionamm-client_integration_solana_v2_1"
+edition = "2021"
+
+[lib]
+path = "../../lib.rs"
+
+[dependencies]
+solana-program = { version = "~2.1.13" }
+fusionamm-client = { path = "../../../client" }

@@ -1,0 +1,18 @@
+[features]
+resolution = false
+
+[programs.localnet]
+fusionamm = "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9"
+[programs.mainnet]
+fusionamm = "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9"
+[programs.devnet]
+fusionamm = "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[test.validator]
+slots_per_epoch = "33"
+ticks_per_slot = 7
+url = "https://api.mainnet-beta.solana.com"

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "allowJs": false,
+    "module": "preserve",
+    "outDir": "./dist",
+    "rootDir": "src",
+    "strict": true,
+    "target": "es2022"
+  }
+}

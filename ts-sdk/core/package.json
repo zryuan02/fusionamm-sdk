@@ -1,0 +1,44 @@
+{
+  "name": "@crypticdot/fusionamm-core",
+  "description": "FusionAMM core typescript package.",
+  "version": "1.0.49",
+  "main": "./dist/nodejs/fusionamm_core_js_bindings.js",
+  "types": "./dist/nodejs/fusionamm_core_js_bindings.d.ts",
+  "browser": "./dist/browser/fusionamm_core_js_bindings.js",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [
+    "./dist/browser/snippets/*",
+    "./dist/browser/fusionamm_core_js_bindings.js"
+  ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "wasm-pack build --release --out-dir ./dist/nodejs --target nodejs && wasm-pack build --release --out-dir ./dist/browser --target browser",
+    "test": "tsc --noEmit && vitest run tests",
+    "prepublishOnly": "rimraf dist/nodejs/.gitignore dist/browser/.gitignore",
+    "deploy": "../../scripts/deploy-npm",
+    "clean": "cargo clean && rimraf dist"
+  },
+  "devDependencies": {
+    "@crypticdot/eslint-config": "^1.0.0",
+    "@crypticdot/prettier-config": "^1.0.0",
+    "@crypticdot/fusionamm-client": "workspace:*",
+    "@crypticdot/fusionamm-rust-core": "workspace:*",
+    "typescript": "^5.8.3",
+    "wasm-pack": "^0.13.1"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "solana",
+    "crypto",
+    "defi",
+    "dex",
+    "amm"
+  ],
+  "homepage": "https://fusionamm.com"
+}

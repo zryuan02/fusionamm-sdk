@@ -1,0 +1,47 @@
+{
+  "name": "@crypticdot/fusionamm-cli",
+  "version": "1.0.0",
+  "description": "FusionAMM command-line interface",
+  "type": "module",
+  "private": true,
+  "bin": "./bin/run.js",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "start": "./bin/dev.js"
+  },
+  "dependencies": {
+    "@crypticdot/fusionamm-core": "workspace:*",
+    "@crypticdot/fusionamm-sdk": "workspace:*",
+    "@crypticdot/fusionamm-client": "workspace:*",
+    "@crypticdot/fusionamm-rust-core": "workspace:*",
+    "@crypticdot/fusionamm-tx-sender": "workspace:*",
+    "@oclif/core": "^4.2.10",
+    "@solana-program/memo": "^0.7.0",
+    "@solana-program/token-2022": "^0.4.0",
+    "@solana/kit": "^2.1.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@crypticdot/eslint-config": "^1.0.0",
+    "@crypticdot/prettier-config": "^1.0.0",
+    "@types/node": "^22.15.2",
+    "oclif": "^4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "oclif": {
+    "bin": "fusionamm-cli",
+    "commands": "./src/commands",
+    "dirname": "fusionamm-cli",
+    "topicSeparator": " "
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "solana",
+    "crypto",
+    "defi",
+    "dex",
+    "amm"
+  ],
+  "homepage": "https://fusionamm.com"
+}

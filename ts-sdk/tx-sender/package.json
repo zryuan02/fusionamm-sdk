@@ -1,0 +1,46 @@
+{
+  "name": "@crypticdot/fusionamm-tx-sender",
+  "description": "A TypeScript package for building and sending Solana transactions with support for priority fees and Jito tips.",
+  "version": "1.0.10",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@solana-program/address-lookup-table": "^0.7.0",
+    "@solana-program/compute-budget": "^0.7.0",
+    "@solana-program/system": "^0.7.0",
+    "@solana/kit": "^2.1.0",
+    "@solana/rpc": "^2.1.0",
+    "@solana/rpc-api": "^2.1.0"
+  },
+  "devDependencies": {
+    "@crypticdot/eslint-config": "^1.0.0",
+    "@crypticdot/prettier-config": "^1.0.0",
+    "@solana/kit": "^2.1.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3"
+  }
+}
