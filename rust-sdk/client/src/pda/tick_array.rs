@@ -10,7 +10,7 @@
 
 use crate::generated::programs::FUSIONAMM_ID;
 use solana_program::program_error::ProgramError;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 pub fn get_tick_array_address(fusion_pool: &Pubkey, start_tick_index: i32) -> Result<(Pubkey, u8), ProgramError> {
     let start_tick_index_str = start_tick_index.to_string();

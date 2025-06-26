@@ -8,15 +8,17 @@
 // See the LICENSE file in the project root for license information.
 //
 
+use crate::{NativeMintWrappingStrategy, NATIVE_MINT_WRAPPING_STRATEGY};
 use fusionamm_core::TransferFee;
+use solana_account::Account as SolanaAccount;
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::account::Account as SolanaAccount;
-use solana_sdk::hash::hashv;
-use solana_sdk::program_error::ProgramError;
-use solana_sdk::signature::Keypair;
-use solana_sdk::signer::Signer;
-use solana_sdk::system_instruction::{create_account, create_account_with_seed, transfer};
-use solana_sdk::{instruction::Instruction, pubkey::Pubkey};
+use solana_instruction::Instruction;
+use solana_keypair::Keypair;
+use solana_program::hash::hashv;
+use solana_program::system_instruction::{create_account, create_account_with_seed, transfer};
+use solana_program_error::ProgramError;
+use solana_pubkey::Pubkey;
+use solana_signer::Signer;
 use spl_associated_token_account::{get_associated_token_address_with_program_id, instruction::create_associated_token_account};
 use spl_token::instruction::{close_account, initialize_account3, sync_native};
 use spl_token::solana_program::program_pack::Pack;
@@ -27,8 +29,6 @@ use spl_token_2022::state::{Account, Mint};
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use std::{collections::HashMap, error::Error};
-
-use crate::{NativeMintWrappingStrategy, NATIVE_MINT_WRAPPING_STRATEGY};
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) enum TokenAccountStrategy {

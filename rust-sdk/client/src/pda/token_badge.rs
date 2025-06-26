@@ -10,7 +10,7 @@
 
 use crate::generated::programs::FUSIONAMM_ID;
 use solana_program::program_error::ProgramError;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 pub fn get_token_badge_address(token_mint: &Pubkey) -> Result<(Pubkey, u8), ProgramError> {
     let seeds = &[b"token_badge", token_mint.as_ref()];

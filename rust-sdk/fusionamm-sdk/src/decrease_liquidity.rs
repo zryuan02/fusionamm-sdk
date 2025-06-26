@@ -8,6 +8,10 @@
 // See the LICENSE file in the project root for license information.
 //
 
+use crate::{
+    token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
+    FUNDER, SLIPPAGE_TOLERANCE_BPS,
+};
 use fusionamm_client::{get_position_address, get_tick_array_address, FusionPool, Position, TickArray};
 use fusionamm_client::{ClosePosition, CollectFees, CollectFeesInstructionArgs, DecreaseLiquidity, DecreaseLiquidityInstructionArgs};
 use fusionamm_core::{
@@ -15,15 +19,11 @@ use fusionamm_core::{
     get_tick_index_in_array, CollectFeesQuote, DecreaseLiquidityQuote,
 };
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::{instruction::Instruction, pubkey::Pubkey, signature::Keypair};
+use solana_instruction::Instruction;
+use solana_keypair::Keypair;
+use solana_pubkey::Pubkey;
 use spl_associated_token_account::get_associated_token_address_with_program_id;
 use std::{collections::HashSet, error::Error};
-
-use crate::{
-    token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
-    FUNDER, SLIPPAGE_TOLERANCE_BPS,
-};
-
 // TODO: support transfer hooks
 
 /// Represents the parameters for decreasing liquidity in a pool.
@@ -91,15 +91,15 @@ pub struct DecreaseLiquidityInstruction {
 ///     decrease_liquidity_instructions, DecreaseLiquidityParam
 /// };
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey::Pubkey;
-/// use std::str::FromStr;
-/// use crate::utils::load_wallet;
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let rpc = RpcClient::new("https://api.devnet.solana.com".to_string());
-///     let wallet = load_wallet();
-///     let position_mint_address = Pubkey::from_str("HqoV7Qv27REUtmd9UKSJGGmCRNx3531t33bDG1BUfo9K").unwrap();
+///     let wallet = Keypair::new(); // Load your wallet
+///     let position_mint_address = pubkey!("HqoV7Qv27REUtmd9UKSJGGmCRNx3531t33bDG1BUfo9K");
 ///     let param = DecreaseLiquidityParam::TokenA(1_000_000);
 ///     let result = decrease_liquidity_instructions(
 ///         &rpc,
@@ -298,9 +298,9 @@ pub struct ClosePositionInstruction {
 /// ```rust
 /// use fusionamm_sdk::close_position_instructions;
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey::Pubkey;
-/// use solana_sdk::pubkey;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -501,12 +501,11 @@ mod tests {
     use rstest::rstest;
     use serial_test::serial;
     use solana_client::nonblocking::rpc_client::RpcClient;
+    use solana_keypair::Keypair;
+    use solana_program::program_pack::Pack;
     use solana_program_test::tokio;
-    use solana_sdk::{
-        program_pack::Pack,
-        pubkey::Pubkey,
-        signer::{keypair::Keypair, Signer},
-    };
+    use solana_pubkey::Pubkey;
+    use solana_signer::Signer;
     use spl_token::state::Account as TokenAccount;
     use spl_token_2022::{extension::StateWithExtensionsOwned, state::Account as TokenAccount2022, ID as TOKEN_2022_PROGRAM_ID};
 

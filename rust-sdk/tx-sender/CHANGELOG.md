@@ -1,5 +1,23 @@
 # @crypticdot/fusionamm-rust-tx-sender
 
+## 1.0.9
+
+### Patch Changes
+
+- 4d4824b: Usage of granular crates instead of solana-sdk
+
+## 1.0.8
+
+### Patch Changes
+
+- 954d4ef: bugfix: replace_recent_blockhash is not set to true if using the default blockhash
+
+## 1.0.7
+
+### Patch Changes
+
+- 13223fe: Added sig_verify_on_simulation config option
+
 ## 1.0.6
 
 ### Patch Changes

@@ -8,7 +8,10 @@
 // See the LICENSE file in the project root for license information.
 //
 
-use solana_sdk::{pubkey::Pubkey, signer::Signer, system_instruction};
+use super::rpc::RpcContext;
+use solana_program::system_instruction::create_account;
+use solana_pubkey::Pubkey;
+use solana_signer::Signer;
 use spl_associated_token_account::{get_associated_token_address_with_program_id, instruction::create_associated_token_account_idempotent};
 use spl_token_2022::{
     extension::{
@@ -20,8 +23,6 @@ use spl_token_2022::{
     ID as TOKEN_2022_PROGRAM_ID,
 };
 use std::error::Error;
-
-use super::rpc::RpcContext;
 
 #[derive(Default)]
 pub struct SetupAtaConfig {
@@ -36,7 +37,7 @@ pub async fn setup_mint_te(ctx: &RpcContext, extensions: &[ExtensionType]) -> Re
     let space = ExtensionType::try_calculate_account_len::<Mint>(extensions)?;
     let rent = ctx.rpc.get_minimum_balance_for_rent_exemption(space).await?;
 
-    instructions.push(system_instruction::create_account(&ctx.signer.pubkey(), &mint.pubkey(), rent, space as u64, &TOKEN_2022_PROGRAM_ID));
+    instructions.push(create_account(&ctx.signer.pubkey(), &mint.pubkey(), rent, space as u64, &TOKEN_2022_PROGRAM_ID));
 
     // 2. Initialize extensions first
     for extension in extensions {

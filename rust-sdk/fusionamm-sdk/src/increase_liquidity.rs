@@ -8,8 +8,11 @@
 // See the LICENSE file in the project root for license information.
 //
 
-use std::error::Error;
-
+use crate::get_rent;
+use crate::{
+    token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
+    FUNDER, SLIPPAGE_TOLERANCE_BPS,
+};
 use fusionamm_client::{
     get_position_address, get_tick_array_address, FusionPool, InitializeTickArray, InitializeTickArrayInstructionArgs, OpenPosition,
     OpenPositionInstructionArgs, Position, TickArray, FP_NFT_UPDATE_AUTH,
@@ -19,19 +22,16 @@ use fusionamm_core::{
     get_full_range_tick_indexes, get_initializable_tick_index, get_tick_array_start_tick_index, increase_liquidity_quote, increase_liquidity_quote_a,
     increase_liquidity_quote_b, order_tick_indexes, price_to_tick_index, IncreaseLiquidityQuote, TransferFee,
 };
+use solana_account::Account;
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::account::Account;
-use solana_sdk::program_pack::Pack;
-use solana_sdk::signer::Signer;
-use solana_sdk::{instruction::Instruction, pubkey::Pubkey, signature::Keypair};
+use solana_instruction::Instruction;
+use solana_keypair::Keypair;
+use solana_program::program_pack::Pack;
+use solana_pubkey::Pubkey;
+use solana_signer::Signer;
 use spl_associated_token_account::get_associated_token_address_with_program_id;
 use spl_token_2022::state::Mint;
-
-use crate::get_rent;
-use crate::{
-    token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
-    FUNDER, SLIPPAGE_TOLERANCE_BPS,
-};
+use std::error::Error;
 
 pub enum PriceOrTickIndex {
     Tick(i32),
@@ -152,12 +152,13 @@ pub struct IncreaseLiquidityInstruction {
 /// ```rust
 /// use fusionamm_sdk::{ increase_liquidity_instructions, IncreaseLiquidityParam };
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::signature::{Keypair, Signer};
-/// use solana_sdk::pubkey;
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let rpc = RpcClient::new("https://api.mainnet.solana.com".to_string());
+/// let rpc = RpcClient::new("https://api.mainnet.solana.com".to_string());
 ///     let wallet = Keypair::new(); // Load your wallet here
 ///
 ///     let position_mint_address = pubkey!("HqoV7Qv27REUtmd9UKSJGGmCRNx3531t33bDG1BUfo9K");
@@ -384,7 +385,7 @@ async fn internal_open_position(
                 fusion_pool: pool_address,
                 funder,
                 tick_array: lower_tick_array_address,
-                system_program: solana_sdk::system_program::id(),
+                system_program: solana_program::system_program::id(),
             }
             .instruction(InitializeTickArrayInstructionArgs {
                 start_tick_index: lower_tick_start_index,
@@ -399,7 +400,7 @@ async fn internal_open_position(
                 fusion_pool: pool_address,
                 funder,
                 tick_array: upper_tick_array_address,
-                system_program: solana_sdk::system_program::id(),
+                system_program: solana_program::system_program::id(),
             }
             .instruction(InitializeTickArrayInstructionArgs {
                 start_tick_index: upper_tick_start_index,
@@ -426,7 +427,7 @@ async fn internal_open_position(
             position_token_account: position_token_account_address,
             fusion_pool: pool_address,
             token2022_program: spl_token_2022::ID,
-            system_program: solana_sdk::system_program::id(),
+            system_program: solana_program::system_program::id(),
             associated_token_program: spl_associated_token_account::ID,
             metadata_update_auth: FP_NFT_UPDATE_AUTH,
         }
@@ -508,17 +509,17 @@ async fn internal_open_position(
 ///
 /// ```rust
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey::Pubkey;
 /// use fusionamm_sdk::{open_full_range_position_instructions, IncreaseLiquidityParam};
-/// use std::str::FromStr;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let rpc = RpcClient::new("https://api.mainnet.solana.com".to_string());
+/// let rpc = RpcClient::new("https://api.mainnet.solana.com".to_string());
 ///     let wallet = Keypair::new(); // Load your wallet here
 ///
-///     let fusion_pool_pubkey = Pubkey::from_str("7VuKeevbvbQQcxz6N4SNLmuq6PYy4AcGQRDssoqo4t65").unwrap();;
+///     let fusion_pool_pubkey = pubkey!("7VuKeevbvbQQcxz6N4SNLmuq6PYy4AcGQRDssoqo4t65");
 ///     let param = IncreaseLiquidityParam::TokenA(1_000_000);
 ///     let slippage_tolerance_bps = Some(100);
 ///     let funder = Some(wallet.pubkey());
@@ -600,9 +601,9 @@ pub async fn open_full_range_position_instructions(
 /// ```rust
 /// use fusionamm_sdk::{open_position_instructions, IncreaseLiquidityParam, PriceOrTickIndex};
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey;
-/// use solana_sdk::pubkey::Pubkey;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -684,11 +685,6 @@ mod tests {
     use rstest::rstest;
     use serial_test::serial;
     use solana_program_test::tokio;
-    use solana_sdk::{
-        program_pack::Pack,
-        pubkey::Pubkey,
-        signer::{keypair::Keypair, Signer},
-    };
     use spl_token::state::Account as TokenAccount;
     use spl_token_2022::{extension::StateWithExtensionsOwned, state::Account as TokenAccount2022, ID as TOKEN_2022_PROGRAM_ID};
 
@@ -703,6 +699,10 @@ mod tests {
 
     use crate::tests::setup_position;
     use solana_client::nonblocking::rpc_client::RpcClient;
+    use solana_keypair::Keypair;
+    use solana_program::program_pack::Pack;
+    use solana_pubkey::Pubkey;
+    use solana_signer::Signer;
 
     async fn fetch_position(rpc: &RpcClient, address: Pubkey) -> Result<Position, Box<dyn Error>> {
         let account = rpc.get_account(&address).await?;
@@ -893,7 +893,6 @@ mod tests {
 
         let position_mint = setup_position(&ctx, pool_pubkey, Some((-100, 100)), None).await?;
 
-        use solana_sdk::pubkey::Pubkey;
         let param = IncreaseLiquidityParam::Liquidity(100_000);
         let res = increase_liquidity_instructions(
             &ctx.rpc,

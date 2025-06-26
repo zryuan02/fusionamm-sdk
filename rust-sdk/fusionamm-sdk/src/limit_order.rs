@@ -11,10 +11,11 @@ use fusionamm_core::{
     LimitOrderDecreaseQuote,
 };
 use solana_client::nonblocking::rpc_client::RpcClient;
+use solana_keypair::Keypair;
 use solana_program::instruction::Instruction;
+use solana_program::program_pack::Pack;
 use solana_program::pubkey::Pubkey;
-use solana_sdk::program_pack::Pack;
-use solana_sdk::signature::{Keypair, Signer};
+use solana_signer::Signer;
 use spl_associated_token_account::get_associated_token_address_with_program_id;
 use spl_token_2022::state::Mint;
 use std::error::Error;
@@ -99,9 +100,9 @@ pub struct DecreaseLimitOrderInstruction {
 /// ```rust
 /// use fusionamm_sdk::{open_limit_order_instructions, PriceOrTickIndex};
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey;
-/// use solana_sdk::pubkey::Pubkey;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -209,7 +210,7 @@ pub async fn open_limit_order_instructions(
                 fusion_pool: pool_address,
                 funder,
                 tick_array: tick_array_address,
-                system_program: solana_sdk::system_program::id(),
+                system_program: solana_program::system_program::id(),
             }
             .instruction(InitializeTickArrayInstructionArgs {
                 start_tick_index: tick_array_start_index,
@@ -232,7 +233,7 @@ pub async fn open_limit_order_instructions(
             limit_order_token_account: limit_order_token_account_address,
             fusion_pool: pool_address,
             token2022_program: spl_token_2022::ID,
-            system_program: solana_sdk::system_program::id(),
+            system_program: solana_program::system_program::id(),
             associated_token_program: spl_associated_token_account::ID,
         }
         .instruction(OpenLimitOrderInstructionArgs { tick_index, a_to_b }),
@@ -407,9 +408,9 @@ pub async fn increase_limit_order_instructions(
 /// ```rust
 /// use fusionamm_sdk::close_limit_order_instructions;
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey;
-/// use solana_sdk::pubkey::Pubkey;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -470,9 +471,9 @@ pub async fn close_limit_order_instructions(
 /// ```rust
 /// use fusionamm_sdk::decrease_limit_order_instructions;
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey;
-/// use solana_sdk::pubkey::Pubkey;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -627,12 +628,11 @@ mod tests {
     use rstest::rstest;
     use serial_test::serial;
     use solana_client::nonblocking::rpc_client::RpcClient;
+    use solana_keypair::Keypair;
+    use solana_program::program_pack::Pack;
     use solana_program_test::tokio;
-    use solana_sdk::program_pack::Pack;
-    use solana_sdk::{
-        pubkey::Pubkey,
-        signer::{keypair::Keypair, Signer},
-    };
+    use solana_pubkey::Pubkey;
+    use solana_signer::Signer;
     use spl_token::state::Account as TokenAccount;
     use spl_token_2022::{extension::StateWithExtensionsOwned, state::Account as TokenAccount2022, ID as TOKEN_2022_PROGRAM_ID};
     use std::collections::HashMap;

@@ -8,19 +8,19 @@
 // See the LICENSE file in the project root for license information.
 //
 
-use std::{collections::HashSet, error::Error};
-
-use fusionamm_client::{get_position_address, get_tick_array_address, FusionPool, Position, TickArray};
-use fusionamm_client::{CollectFees, CollectFeesInstructionArgs, UpdateFees};
-use fusionamm_core::{collect_fees_quote, get_tick_array_start_tick_index, get_tick_index_in_array, CollectFeesQuote};
-use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::{instruction::Instruction, pubkey::Pubkey, signature::Keypair};
-use spl_associated_token_account::get_associated_token_address_with_program_id;
-
 use crate::{
     token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
     FUNDER,
 };
+use fusionamm_client::{get_position_address, get_tick_array_address, FusionPool, Position, TickArray};
+use fusionamm_client::{CollectFees, CollectFeesInstructionArgs, UpdateFees};
+use fusionamm_core::{collect_fees_quote, get_tick_array_start_tick_index, get_tick_index_in_array, CollectFeesQuote};
+use solana_client::nonblocking::rpc_client::RpcClient;
+use solana_instruction::Instruction;
+use solana_keypair::Keypair;
+use solana_pubkey::Pubkey;
+use spl_associated_token_account::get_associated_token_address_with_program_id;
+use std::{collections::HashSet, error::Error};
 
 // TODO: support transfer hooks
 
@@ -75,17 +75,16 @@ pub struct HarvestPositionInstruction {
 /// ```rust
 /// use fusionamm_sdk::harvest_position_instructions;
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey::Pubkey;
-/// use std::str::FromStr;
-/// use crate::utils::load_wallet;
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let rpc = RpcClient::new("https://api.devnet.solana.com".to_string());
-///     let wallet = load_wallet();
+///     let wallet = Keypair::new(); // Load your wallet
 ///
-///     let position_mint_address =
-///         Pubkey::from_str("HqoV7Qv27REUtmd9UKSJGGmCRNx3531t33bDG1BUfo9K").unwrap();
+///     let position_mint_address = pubkey!("HqoV7Qv27REUtmd9UKSJGGmCRNx3531t33bDG1BUfo9K");
 ///
 ///     let result = harvest_position_instructions(&rpc, position_mint_address, Some(wallet.pubkey()))
 ///         .await
@@ -225,15 +224,8 @@ mod tests {
     use serial_test::serial;
     use solana_client::nonblocking::rpc_client::RpcClient;
     use solana_program_test::tokio;
-    use solana_sdk::{
-        program_pack::Pack,
-        pubkey::Pubkey,
-        signer::{keypair::Keypair, Signer},
-    };
     use spl_token::state::Account as TokenAccount;
     use spl_token_2022::{extension::StateWithExtensionsOwned, state::Account as TokenAccount2022, ID as TOKEN_2022_PROGRAM_ID};
-
-    use rstest::rstest;
 
     use crate::{
         harvest_position_instructions, increase_liquidity_instructions, swap_instructions,
@@ -243,6 +235,11 @@ mod tests {
         },
         HarvestPositionInstruction, IncreaseLiquidityParam, SwapType,
     };
+    use rstest::rstest;
+    use solana_keypair::Keypair;
+    use solana_program::program_pack::Pack;
+    use solana_pubkey::Pubkey;
+    use solana_signer::Signer;
 
     async fn fetch_position(rpc: &solana_client::nonblocking::rpc_client::RpcClient, position_pubkey: Pubkey) -> Result<Position, Box<dyn Error>> {
         let account = rpc.get_account(&position_pubkey).await?;

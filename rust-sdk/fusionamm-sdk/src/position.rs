@@ -8,16 +8,15 @@
 // See the LICENSE file in the project root for license information.
 //
 
-use std::{collections::HashMap, error::Error};
-
 use fusionamm_client::{
     fetch_all_position_with_filter, get_bundled_position_address, get_position_address, get_position_bundle_address, DecodedAccount, Position,
     PositionBundle, PositionFilter,
 };
 use fusionamm_core::POSITION_BUNDLE_SIZE;
+use solana_account::Account;
 use solana_client::{nonblocking::rpc_client::RpcClient, rpc_request::TokenAccountsFilter};
-use solana_sdk::account::Account;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
+use std::{collections::HashMap, error::Error};
 
 use crate::{get_token_accounts_for_owner, ParsedTokenAccount};
 
@@ -126,14 +125,14 @@ fn get_position_in_bundle_addresses(position_bundle: &PositionBundle) -> Vec<Pub
 /// ```rust
 /// use fusionamm_sdk::fetch_positions_for_owner;
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey::Pubkey;
-/// use std::str::FromStr;
+/// use solana_keypair::Keypair;
+/// use solana_pubkey::pubkey;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let rpc = RpcClient::new("https://api.devnet.solana.com".to_string());
-///     let owner =
-///         Pubkey::from_str("FTEV6CnregJCqU8s8hGR3VAYCrPKHfekXLsJaKHbPBxp").unwrap();
+///     let owner = pubkey!("FTEV6CnregJCqU8s8hGR3VAYCrPKHfekXLsJaKHbPBxp");
 ///
 ///     let positions = fetch_positions_for_owner(&rpc, owner)
 ///         .await
@@ -264,14 +263,14 @@ pub async fn fetch_positions_for_owner(rpc: &RpcClient, owner: Pubkey) -> Result
 ///     fetch_positions_in_fusion_pool,
 /// };
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::pubkey::Pubkey;
-/// use std::str::FromStr;
+/// use solana_keypair::Keypair;
+/// use solana_pubkey::pubkey;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let rpc = RpcClient::new("https://api.devnet.solana.com".to_string());
-///     let fusion_pool_address =
-///         Pubkey::from_str("3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt").unwrap();
+///     let fusion_pool_address = pubkey!("3KBZiL2g8C7tiJ32hTv5v3KM7aK9htpqTw4cTXz1HvPt");
 ///
 ///     let positions = fetch_positions_in_fusion_pool(&rpc, fusion_pool_address)
 ///         .await
@@ -291,7 +290,7 @@ mod tests {
     use crate::tests::{setup_ata_with_amount, setup_fusion_pool, setup_mint_with_decimals, setup_position, setup_position_bundle, RpcContext};
     use serial_test::serial;
     use solana_program_test::tokio;
-    use solana_sdk::signer::Signer;
+    use solana_signer::Signer;
     use std::error::Error;
 
     #[tokio::test]

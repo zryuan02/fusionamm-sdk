@@ -12,7 +12,7 @@ use log::{error, info, warn};
 use reqwest::{Client, Method, Url};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
+use solana_program::native_token::LAMPORTS_PER_SOL;
 use std::time::Duration;
 use tokio::task::JoinHandle;
 use tokio::time::sleep;

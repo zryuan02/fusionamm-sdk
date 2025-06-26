@@ -8,6 +8,7 @@
 // See the LICENSE file in the project root for license information.
 //
 
+use super::rpc::RpcContext;
 use fusionamm_client::{
     get_bundled_position_address, get_fusion_pool_address, get_fusion_pools_config_address, get_position_address, get_position_bundle_address,
     get_tick_array_address, get_token_badge_address, FusionPool, InitializePool, InitializePoolInstructionArgs, InitializePositionBundle,
@@ -16,13 +17,13 @@ use fusionamm_client::{
 };
 use fusionamm_core::{get_initializable_tick_index, get_tick_array_start_tick_index, tick_index_to_sqrt_price, TICK_ARRAY_SIZE};
 use solana_program::sysvar::rent::ID as RENT_PROGRAM_ID;
-use solana_sdk::{pubkey::Pubkey, signer::Signer, system_program};
+use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program;
+use solana_signer::Signer;
 use spl_associated_token_account::get_associated_token_address_with_program_id;
 use spl_token::ID as TOKEN_PROGRAM_ID;
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
 use std::error::Error;
-
-use super::rpc::RpcContext;
 
 pub async fn init_tick_arrays_for_range(
     ctx: &RpcContext,

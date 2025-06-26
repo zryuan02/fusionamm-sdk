@@ -13,8 +13,8 @@ use serde_json::from_value;
 use solana_account_decoder::UiAccountData;
 use solana_client::{nonblocking::rpc_client::RpcClient, rpc_request::TokenAccountsFilter};
 use solana_program::pubkey::Pubkey;
-use solana_sdk::rent::Rent;
-use solana_sdk::sysvar::SysvarId;
+use solana_program::rent::Rent;
+use solana_program::sysvar::SysvarId;
 use std::{error::Error, str::FromStr};
 
 #[derive(Debug, Clone)]

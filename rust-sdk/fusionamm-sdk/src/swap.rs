@@ -8,8 +8,10 @@
 // See the LICENSE file in the project root for license information.
 //
 
-use std::{error::Error, iter::zip};
-
+use crate::{
+    token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
+    FUNDER, SLIPPAGE_TOLERANCE_BPS,
+};
 use fusionamm_client::{
     get_tick_array_address, AccountsType, FusionPool, RemainingAccountsInfo, RemainingAccountsSlice, Swap, SwapInstructionArgs, TickArray,
 };
@@ -18,13 +20,10 @@ use fusionamm_core::{
     TickFacade, TICK_ARRAY_SIZE,
 };
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::{instruction::AccountMeta, instruction::Instruction, pubkey::Pubkey, signature::Keypair};
-
-use crate::{
-    token::{get_current_transfer_fee, prepare_token_accounts_instructions, TokenAccountStrategy},
-    FUNDER, SLIPPAGE_TOLERANCE_BPS,
-};
-
+use solana_instruction::{AccountMeta, Instruction};
+use solana_keypair::Keypair;
+use solana_pubkey::Pubkey;
+use std::{error::Error, iter::zip};
 // TODO: transfer hooks
 
 /// Represents the type of a swap operation.
@@ -154,8 +153,9 @@ async fn fetch_tick_arrays_or_default(
 /// use fusionamm_sdk::{swap_instructions, SwapType};
 /// use solana_client::nonblocking::rpc_client::RpcClient;
 /// use std::str::FromStr;
-/// use solana_sdk::pubkey;
-/// use solana_sdk::signature::{Keypair, Signer};
+/// use solana_pubkey::pubkey;
+/// use solana_keypair::Keypair;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -322,12 +322,11 @@ mod tests {
     use rstest::rstest;
     use serial_test::serial;
     use solana_client::nonblocking::rpc_client::RpcClient;
+    use solana_keypair::Keypair;
+    use solana_program::program_pack::Pack;
     use solana_program_test::tokio;
-    use solana_sdk::{
-        program_pack::Pack,
-        pubkey::Pubkey,
-        signer::{keypair::Keypair, Signer},
-    };
+    use solana_pubkey::Pubkey;
+    use solana_signer::Signer;
     use spl_token::state::Account as TokenAccount;
     use spl_token_2022::{extension::StateWithExtensionsOwned, state::Account as TokenAccount2022, ID as TOKEN_2022_PROGRAM_ID};
 

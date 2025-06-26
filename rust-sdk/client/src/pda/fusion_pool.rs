@@ -10,7 +10,7 @@
 
 use crate::generated::programs::FUSIONAMM_ID;
 use solana_program::program_error::ProgramError;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 pub fn get_fusion_pool_address(token_mint_a: &Pubkey, token_mint_b: &Pubkey, tick_spacing: u16) -> Result<(Pubkey, u8), ProgramError> {
     let tick_spacing_bytes = tick_spacing.to_le_bytes();

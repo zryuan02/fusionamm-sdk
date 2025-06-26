@@ -1,5 +1,7 @@
 # @crypticdot/fusionamm-core
 
+## 1.0.50
+
 ## 1.0.49
 
 ### Patch Changes

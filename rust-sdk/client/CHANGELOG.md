@@ -1,5 +1,11 @@
 # @crypticdot/fusionamm-rust-client
 
+## 1.0.50
+
+### Patch Changes
+
+- 4d4824b: Usage of granular crates instead of solana-sdk
+
 ## 1.0.49
 
 ## 1.0.48

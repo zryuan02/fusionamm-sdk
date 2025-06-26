@@ -8,14 +8,11 @@
 // See the LICENSE file in the project root for license information.
 //
 
-use std::error::Error;
-
-use solana_sdk::{
-    program_pack::Pack,
-    pubkey::Pubkey,
-    signer::Signer,
-    system_instruction::{create_account, transfer},
-};
+use super::RpcContext;
+use solana_program::program_pack::Pack;
+use solana_program::system_instruction::{create_account, transfer};
+use solana_pubkey::Pubkey;
+use solana_signer::Signer;
 use spl_associated_token_account::{get_associated_token_address_with_program_id, instruction::create_associated_token_account_idempotent};
 use spl_token::{
     instruction::{initialize_mint2, mint_to, sync_native},
@@ -23,8 +20,7 @@ use spl_token::{
     state::Mint,
     ID as TOKEN_PROGRAM_ID,
 };
-
-use super::RpcContext;
+use std::error::Error;
 
 pub async fn setup_ata(ctx: &RpcContext, mint: Pubkey) -> Result<Pubkey, Box<dyn Error>> {
     setup_ata_with_amount(ctx, mint, 0).await

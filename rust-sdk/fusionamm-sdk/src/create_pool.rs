@@ -16,12 +16,12 @@ use fusionamm_client::{FusionPool, TickArray};
 use fusionamm_client::{InitializePool, InitializePoolInstructionArgs, InitializeTickArray, InitializeTickArrayInstructionArgs};
 use fusionamm_core::{get_full_range_tick_indexes, get_tick_array_start_tick_index, price_to_sqrt_price, sqrt_price_to_tick_index};
 use solana_client::nonblocking::rpc_client::RpcClient;
+use solana_keypair::Keypair;
 use solana_program::rent::Rent;
-use solana_program::system_program;
 use solana_program::sysvar::SysvarId;
 use solana_program::{instruction::Instruction, pubkey::Pubkey};
-use solana_sdk::signature::Keypair;
-use solana_sdk::signer::Signer;
+use solana_sdk_ids::system_program;
+use solana_signer::Signer;
 use spl_token_2022::extension::StateWithExtensions;
 use spl_token_2022::state::Mint;
 
@@ -75,14 +75,15 @@ pub struct CreatePoolInstructions {
 /// ```
 /// use fusionamm_sdk::create_fusion_pool_instructions;
 /// use solana_client::nonblocking::rpc_client::RpcClient;
-/// use solana_sdk::{pubkey::Pubkey, signature::Signer, signer::keypair::Keypair};
-/// use std::str::FromStr;
+/// use solana_keypair::Keypair;
+/// use solana_pubkey::pubkey;
+/// use solana_signer::Signer;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let rpc = RpcClient::new("https://api.devnet.solana.com".to_string());
-///     let token_a = Pubkey::from_str("So11111111111111111111111111111111111111112").unwrap();
-///     let token_b = Pubkey::from_str("BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k").unwrap(); // devUSDC
+///     let token_a = pubkey!("So11111111111111111111111111111111111111112");
+///     let token_b = pubkey!("BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k"); // devUSDC
 ///     let tick_spacing = 64;
 ///     let fee_rate = 300;
 ///     let initial_price = Some(0.01);

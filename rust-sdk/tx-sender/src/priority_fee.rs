@@ -7,7 +7,7 @@
 
 use solana_client::client_error::ClientError;
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 use std::collections::HashMap;
 
 #[derive(Copy, Clone, PartialEq)]

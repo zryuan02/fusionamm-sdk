@@ -15,16 +15,19 @@ use solana_client::client_error::{ClientError, ClientErrorKind};
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_client::rpc_config::{RpcSendTransactionConfig, RpcSimulateTransactionConfig};
 use solana_client::rpc_response::{Response, RpcSimulateTransactionResult};
+use solana_commitment_config::{CommitmentConfig, CommitmentLevel};
+use solana_compute_budget_interface::ComputeBudgetInstruction;
+use solana_instruction::Instruction;
+use solana_keypair::Keypair;
+use solana_message::{v0, VersionedMessage};
 use solana_program::address_lookup_table::AddressLookupTableAccount;
-use solana_program::message::{v0, VersionedMessage};
-use solana_program::system_instruction;
-use solana_sdk::bs58::encode;
-use solana_sdk::commitment_config::{CommitmentConfig, CommitmentLevel};
-use solana_sdk::compute_budget::ComputeBudgetInstruction;
-use solana_sdk::instruction::Instruction;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::{Keypair, Signature, SignerError};
-use solana_sdk::transaction::{TransactionError, VersionedTransaction};
+use solana_program::hash::Hash;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
+use solana_signer::SignerError;
+use solana_system_interface::instruction::transfer;
+use solana_transaction::versioned::VersionedTransaction;
+use solana_transaction_error::TransactionError;
 use solana_transaction_status::TransactionConfirmationStatus;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -41,6 +44,7 @@ pub struct SmartTxConfig {
     /// This value is only used if estimation fails.
     pub default_compute_unit_limit: u32,
     pub ingore_simulation_error: bool,
+    pub sig_verify_on_simulation: bool,
     /// The default timeout is 60 seconds.
     pub transaction_timeout: Option<Duration>,
 }
@@ -52,6 +56,7 @@ impl Default for SmartTxConfig {
             jito: None,
             default_compute_unit_limit: MAX_COMPUTE_UNIT_LIMIT,
             ingore_simulation_error: false,
+            sig_verify_on_simulation: true,
             transaction_timeout: None,
         }
     }
@@ -114,7 +119,7 @@ pub async fn send_smart_transaction(
         }
     }
 
-    let signers_copy: Vec<Keypair> = signers.iter().map(|keypair| Keypair::from_bytes(&keypair.to_bytes()).unwrap()).collect();
+    let signers_copy: Vec<Keypair> = signers.iter().map(|keypair| keypair.insecure_clone()).collect();
 
     let mut all_instructions = Vec::<Instruction>::new();
     if priority_fee > 0 {
@@ -127,14 +132,14 @@ pub async fn send_smart_transaction(
         let rnd = rand::rng().random_range(0..JITO_TIP_ACCOUNTS.len());
         let tip_amount = jito_config.tips.max(MIN_JITO_TIP_LAMPORTS);
         let random_tip_account = Pubkey::from_str(JITO_TIP_ACCOUNTS[rnd]).unwrap();
-        let tip_instruction = system_instruction::transfer(payer, &random_tip_account, tip_amount);
+        let tip_instruction = transfer(payer, &random_tip_account, tip_amount);
         all_instructions.push(tip_instruction);
     }
 
     // Simulate transaction and estimate CU usage. A simulation may fail, so do it a few times.
     let mut cu_limit = 0;
     for _ in 0..5 {
-        match simulate_transaction(client, &all_instructions, payer, &signers_copy, lookup_tables.clone()).await {
+        match simulate_transaction(client, &all_instructions, payer, &signers_copy, lookup_tables.clone(), tx_config.sig_verify_on_simulation).await {
             Ok(response) => {
                 if let Some(err) = response.value.err {
                     match err.clone() {
@@ -186,7 +191,7 @@ pub async fn send_smart_transaction(
 
     if let Some(jito_config) = tx_config.jito {
         let serialized_transaction = bincode::serialize(&transaction).expect("Failed to serialize transaction");
-        let transaction_base58 = encode(&serialized_transaction).into_string();
+        let transaction_base58 = bs58::encode(&serialized_transaction).into_string();
 
         let user_provided_region = jito_config.region.unwrap_or("Default".to_string());
         let jito_api_base_url = get_jito_api_url_by_region(&user_provided_region);
@@ -233,20 +238,25 @@ async fn simulate_transaction(
     payer: &Pubkey,
     signers: &[Keypair],
     lookup_tables: Vec<AddressLookupTableAccount>,
+    sig_verify: bool,
 ) -> Result<Response<RpcSimulateTransactionResult>, SmartTransactionError> {
     // Set the compute budget limit
     let mut test_instructions = vec![ComputeBudgetInstruction::set_compute_unit_limit(MAX_COMPUTE_UNIT_LIMIT)];
     test_instructions.extend(instructions.to_vec());
 
     // Fetch the latest blockhash
-    let recent_blockhash = client.get_latest_blockhash().await?;
+    let recent_blockhash = if sig_verify {
+        client.get_latest_blockhash().await?
+    } else {
+        Hash::default()
+    };
 
     let versioned_message = VersionedMessage::V0(v0::Message::try_compile(payer, &test_instructions, &lookup_tables, recent_blockhash)?);
     let transaction = VersionedTransaction::try_new(versioned_message, signers)?;
 
     let simulate_config = RpcSimulateTransactionConfig {
-        sig_verify: true,
-        replace_recent_blockhash: false,
+        sig_verify,
+        replace_recent_blockhash: !sig_verify,
         commitment: Some(CommitmentConfig::confirmed()),
         encoding: None,
         accounts: None,
