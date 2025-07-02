@@ -1349,6 +1349,51 @@
       ]
     },
     {
+      "name": "set_clp_to_olp_reward_ratio",
+      "docs": [
+        "Sets the reward ratio of concentrated liquidity providers to limit orders' liquidity providers.",
+        "Only the current fee authority has permission to invoke this instruction.",
+        "",
+        "### Authority",
+        "- \"fee_authority\" - Set authority that can modify pool fees in the FusionPoolConfig",
+        "",
+        "### Parameters",
+        "- `clp_to_olp_reward_ratio` - The default reward ratio of concentrated liquidity providers to limit orders' liquidity providers",
+        "",
+        "#### Special Errors",
+        "- `ClpToOlpRewardRatioMaxExceeded` - If the provided clp_to_olp_reward_ratio exceeds MAX_CLP_TO_OLP_REWARD_RATIO."
+      ],
+      "discriminator": [
+        209,
+        246,
+        107,
+        185,
+        133,
+        189,
+        221,
+        211
+      ],
+      "accounts": [
+        {
+          "name": "fusion_pools_config"
+        },
+        {
+          "name": "fusion_pool",
+          "writable": true
+        },
+        {
+          "name": "fee_authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "clp_to_olp_reward_ratio",
+          "type": "u16"
+        }
+      ]
+    },
+    {
       "name": "set_collect_protocol_fees_authority",
       "docs": [
         "Sets the fee authority to collect protocol fees for a FusionPoolConfig.",
@@ -1369,7 +1414,8 @@
       ],
       "accounts": [
         {
-          "name": "fusion_pools_config"
+          "name": "fusion_pools_config",
+          "writable": true
         },
         {
           "name": "collect_protocol_fees_authority",
@@ -1409,7 +1455,8 @@
       ],
       "accounts": [
         {
-          "name": "fusion_pools_config"
+          "name": "fusion_pools_config",
+          "writable": true
         },
         {
           "name": "fee_authority",
@@ -1424,7 +1471,7 @@
       ]
     },
     {
-      "name": "set_default_limit_order_protocol_fee_rate",
+      "name": "set_default_order_protocol_fee_rate",
       "docs": [
         "Sets the default limit order protocol fee rate for a FusionPoolConfig",
         "Protocol fee rate is represented as hundredths of a basis point.",
@@ -1440,18 +1487,19 @@
         "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_FEE_RATE."
       ],
       "discriminator": [
-        118,
-        34,
-        157,
-        49,
-        58,
-        16,
-        194,
-        120
+        60,
+        183,
+        119,
+        187,
+        211,
+        51,
+        66,
+        236
       ],
       "accounts": [
         {
-          "name": "fusion_pools_config"
+          "name": "fusion_pools_config",
+          "writable": true
         },
         {
           "name": "fee_authority",
@@ -1493,7 +1541,8 @@
       ],
       "accounts": [
         {
-          "name": "fusion_pools_config"
+          "name": "fusion_pools_config",
+          "writable": true
         },
         {
           "name": "fee_authority",
@@ -1530,7 +1579,8 @@
       ],
       "accounts": [
         {
-          "name": "fusion_pools_config"
+          "name": "fusion_pools_config",
+          "writable": true
         },
         {
           "name": "fee_authority",
@@ -1573,7 +1623,8 @@
           "name": "fusion_pools_config"
         },
         {
-          "name": "fusion_pool"
+          "name": "fusion_pool",
+          "writable": true
         },
         {
           "name": "fee_authority",
@@ -1588,7 +1639,7 @@
       ]
     },
     {
-      "name": "set_limit_order_protocol_fee_rate",
+      "name": "set_order_protocol_fee_rate",
       "docs": [
         "Sets the limit order protocol fee rate for a FusionPool.",
         "Protocol fee rate is represented as hundredths of a basis point.",
@@ -1604,21 +1655,22 @@
         "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE."
       ],
       "discriminator": [
+        206,
+        150,
+        209,
+        147,
+        10,
+        122,
         208,
-        200,
-        255,
-        4,
-        18,
-        137,
-        43,
-        173
+        166
       ],
       "accounts": [
         {
           "name": "fusion_pools_config"
         },
         {
-          "name": "fusion_pool"
+          "name": "fusion_pool",
+          "writable": true
         },
         {
           "name": "fee_authority",
@@ -1713,7 +1765,8 @@
           "name": "fusion_pools_config"
         },
         {
-          "name": "fusion_pool"
+          "name": "fusion_pool",
+          "writable": true
         },
         {
           "name": "fee_authority",

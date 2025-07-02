@@ -1,5 +1,11 @@
 # @crypticdot/fusionamm-client
 
+## 1.0.51
+
+### Patch Changes
+
+- 7e2b2dd: New limit orders fee model and bug fixes
+
 ## 1.0.50
 
 ## 1.0.49

@@ -17,11 +17,10 @@ export default class InitializeConfig extends BaseCommand {
       max: 2500,
     }),
     defaultOrderProtocolFeeRate: Args.integer({
-      description:
-        "Limit order fee rate stored as hundredths of a basis point. The maximum value approximately equals to 6.55%",
+      description: "Limit order fee rate stored as basis points. The maximum value of 10000 equals to 100%",
       required: true,
       min: 0,
-      max: 60000,
+      max: 10000,
     }),
     defaultClpToOlpRewardRatio: Args.integer({
       description:

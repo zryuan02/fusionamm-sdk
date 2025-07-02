@@ -29,16 +29,16 @@ import {
   increaseLiquidityQuote,
   tickIndexToSqrtPrice,
 } from "@crypticdot/fusionamm-core";
-import {MEMO_PROGRAM_ADDRESS} from "@solana-program/memo";
+import { MEMO_PROGRAM_ADDRESS } from "@solana-program/memo";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
   fetchMint,
   findAssociatedTokenPda,
   TOKEN_2022_PROGRAM_ADDRESS,
 } from "@solana-program/token-2022";
-import {address, type Address, type IInstruction} from "@solana/kit";
-import {getNextKeypair} from "./keypair";
-import {rpc, sendTransaction, signer} from "./mockRpc";
+import { address, type Address, type IInstruction } from "@solana/kit";
+import { getNextKeypair } from "./keypair";
+import { rpc, sendTransaction, signer } from "./mockRpc";
 
 export async function setupConfig() {
   const instructions: IInstruction[] = [];
@@ -53,8 +53,8 @@ export async function setupConfig() {
       collectProtocolFeesAuthority: signer.address,
       tokenBadgeAuthority: signer.address,
       defaultProtocolFeeRate: 100,
-      defaultOrderProtocolFeeRate: 100,
-      defaultClpToOlpRewardRatio: 0,
+      defaultOrderProtocolFeeRate: 5000, // 50%
+      defaultClpToOlpRewardRatio: 0, // Everything goes to limit order providers
     }),
   );
 

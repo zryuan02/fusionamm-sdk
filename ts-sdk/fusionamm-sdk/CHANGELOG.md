@@ -1,5 +1,14 @@
 # @crypticdot/fusionamm
 
+## 1.0.51
+
+### Patch Changes
+
+- 7e2b2dd: New limit orders fee model and bug fixes
+- Updated dependencies [7e2b2dd]
+  - @crypticdot/fusionamm-client@1.0.51
+  - @crypticdot/fusionamm-core@1.0.51
+
 ## 1.0.50
 
 ### Patch Changes

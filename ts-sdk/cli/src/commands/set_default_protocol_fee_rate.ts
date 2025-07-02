@@ -1,4 +1,8 @@
-import { fetchMaybeFusionPoolsConfig, getSetDefaultProtocolFeeRateInstruction } from "@crypticdot/fusionamm-client";
+import {
+  fetchMaybeFusionPoolsConfig,
+  getFusionPoolsConfigAddress,
+  getSetDefaultProtocolFeeRateInstruction,
+} from "@crypticdot/fusionamm-client";
 import { sendTransaction } from "@crypticdot/fusionamm-tx-sender";
 import BaseCommand, { addressArg } from "../base";
 import { rpc, signer } from "../rpc";
@@ -6,12 +10,8 @@ import { Args } from "@oclif/core";
 
 export default class SetDefaultProtocolFeeRate extends BaseCommand {
   static override args = {
-    fusionPoolsConfig: addressArg({
-      description: "FusionAMM config address",
-      required: true,
-    }),
     defaultProtocolFeeRate: Args.integer({
-      description: "Portion of fee rate taken stored as basis points. The maximum value equals to 100%",
+      description: "Protocol fee rate taken stored as basis points. The maximum value 2500 equals to 25%",
       required: true,
       min: 0,
       max: 2500,
@@ -23,15 +23,17 @@ export default class SetDefaultProtocolFeeRate extends BaseCommand {
   public async run() {
     const { args } = await this.parse(SetDefaultProtocolFeeRate);
 
-    const config = await fetchMaybeFusionPoolsConfig(rpc, args.fusionPoolsConfig);
+    const fusionPoolsConfig = (await getFusionPoolsConfigAddress())[0];
+
+    const config = await fetchMaybeFusionPoolsConfig(rpc, fusionPoolsConfig);
     if (config.exists) {
       console.log("Config:", config);
     } else {
-      throw new Error("FusionAMM config doesn't exists at address " + args.fusionPoolsConfig);
+      throw new Error("FusionAMM config doesn't exists at address " + fusionPoolsConfig);
     }
 
     const ix = getSetDefaultProtocolFeeRateInstruction({
-      fusionPoolsConfig: args.fusionPoolsConfig,
+      fusionPoolsConfig: fusionPoolsConfig,
       feeAuthority: signer,
       defaultProtocolFeeRate: args.defaultProtocolFeeRate,
     });

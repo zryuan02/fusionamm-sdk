@@ -22,8 +22,6 @@ pub struct LimitOrderFacade {
 pub struct LimitOrderDecreaseQuote {
     pub amount_out_a: u64,
     pub amount_out_b: u64,
-    pub fee_a: u64,
-    pub fee_b: u64,
     pub reward_a: u64,
     pub reward_b: u64,
 }

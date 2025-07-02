@@ -106,10 +106,7 @@ describe("Limit Orders", () => {
   const testCloseLimitOrder = async (args: { limitOrderMint: Address }) => {
     const { limitOrderMint } = args;
 
-    const { instructions, amountWithFeeAppliedA, amountWithFeeAppliedB } = await closeLimitOrderInstructions(
-      rpc,
-      limitOrderMint,
-    );
+    const { instructions } = await closeLimitOrderInstructions(rpc, limitOrderMint);
 
     await sendTransaction(instructions);
   };
@@ -228,15 +225,15 @@ describe("Limit Orders", () => {
       await testSwapExactInput({ poolAddress, inputAmount: 1_000_000n, mint: mintBAddress });
 
       fusionPool = await fetchFusionPool(rpc, poolAddress);
-      expect(fusionPool.data.protocolFeeOwedA).toEqual(11n);
-      expect(fusionPool.data.protocolFeeOwedB).toEqual(poolName == "A-TEFee" ? 11n : 13n);
+      expect(fusionPool.data.protocolFeeOwedA).toEqual(750n);
+      expect(fusionPool.data.protocolFeeOwedB).toEqual(poolName == "A-TEFee" ? 741n : 750n);
       expect(fusionPool.data.ordersTotalAmountA).toEqual(8000000n);
       expect(fusionPool.data.ordersTotalAmountB).toEqual(8000000n);
 
       expect(fusionPool.data.ordersFilledAmountA).toEqual(poolName == "A-TEFee" ? 4380691n : 4422475n);
       expect(fusionPool.data.ordersFilledAmountB).toEqual(4876390n);
-      expect(fusionPool.data.olpFeeOwedA).toEqual(1493n);
-      expect(fusionPool.data.olpFeeOwedB).toEqual(poolName == "A-TEFee" ? 1476n : 1490n);
+      expect(fusionPool.data.olpFeeOwedA).toEqual(754n);
+      expect(fusionPool.data.olpFeeOwedB).toEqual(poolName == "A-TEFee" ? 746n : 753n);
 
       for (const order of orders) {
         await testCloseLimitOrder({
@@ -245,8 +242,8 @@ describe("Limit Orders", () => {
       }
 
       fusionPool = await fetchFusionPool(rpc, poolAddress);
-      expect(fusionPool.data.protocolFeeOwedA).toEqual(517n);
-      expect(fusionPool.data.protocolFeeOwedB).toEqual(poolName == "A-TEFee" ? 511n : 517n);
+      expect(fusionPool.data.protocolFeeOwedA).toEqual(750n);
+      expect(fusionPool.data.protocolFeeOwedB).toEqual(poolName == "A-TEFee" ? 741n : 750n);
       expect(fusionPool.data.ordersTotalAmountA).toEqual(0n);
       expect(fusionPool.data.ordersTotalAmountB).toEqual(0n);
       expect(fusionPool.data.ordersFilledAmountA).toEqual(0n);
