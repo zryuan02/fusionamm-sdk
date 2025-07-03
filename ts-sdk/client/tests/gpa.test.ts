@@ -192,7 +192,7 @@ describe("get program account memcmp filters", () => {
       tickSpacingSeed: new Uint8Array([1, 2]),
       feeRate: 4321,
       protocolFeeRate: 5678,
-      clpToOlpRewardRatio: 10000,
+      clpRewardRate: 10000,
       orderProtocolFeeRate: 1678,
       liquidity: 9012,
       sqrtPrice: 3456,

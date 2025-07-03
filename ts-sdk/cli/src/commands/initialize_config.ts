@@ -22,9 +22,9 @@ export default class InitializeConfig extends BaseCommand {
       min: 0,
       max: 10000,
     }),
-    defaultClpToOlpRewardRatio: Args.integer({
+    defaultClpRewardRate: Args.integer({
       description:
-        "Reward ratio of concentrated liquidity providers to limit orders' liquidity providers stored as basis points",
+        "The reward rate for concentrated liquidity providers stored as basis points. The maximum value 10_000 equals to 100%",
       required: true,
       min: 0,
       max: 10000,
@@ -56,7 +56,7 @@ export default class InitializeConfig extends BaseCommand {
       tokenBadgeAuthority: flags.tokenBadgeAuthority ?? defaultAuthority,
       defaultProtocolFeeRate: args.defaultProtocolFeeRate,
       defaultOrderProtocolFeeRate: args.defaultOrderProtocolFeeRate,
-      defaultClpToOlpRewardRatio: args.defaultClpToOlpRewardRatio,
+      defaultClpRewardRate: args.defaultClpRewardRate,
     });
 
     console.log("");

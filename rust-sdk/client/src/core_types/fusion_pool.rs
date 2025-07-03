@@ -18,7 +18,7 @@ impl From<FusionPool> for FusionPoolFacade {
             tick_spacing: val.tick_spacing,
             fee_rate: val.fee_rate,
             protocol_fee_rate: val.protocol_fee_rate,
-            clp_to_olp_reward_ratio: val.clp_to_olp_reward_ratio,
+            clp_reward_rate: val.clp_reward_rate,
             order_protocol_fee_rate: val.order_protocol_fee_rate,
             liquidity: val.liquidity,
             sqrt_price: val.sqrt_price,

@@ -32,7 +32,7 @@ function testFusionPool(): FusionPoolFacade {
   return {
     tickCurrentIndex: 0,
     protocolFeeRate: 3000,
-    clpToOlpRewardRatio: 0,
+    clpRewardRate: 0,
     orderProtocolFeeRate: 3000,
     feeRate: 3000,
     liquidity: 265000n,

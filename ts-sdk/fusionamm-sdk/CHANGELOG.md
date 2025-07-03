@@ -1,5 +1,14 @@
 # @crypticdot/fusionamm
 
+## 1.0.52
+
+### Patch Changes
+
+- ca86f83: bugifx: incorrect charging of the protocol fee for limit order swaps
+- Updated dependencies [ca86f83]
+  - @crypticdot/fusionamm-client@1.0.52
+  - @crypticdot/fusionamm-core@1.0.52
+
 ## 1.0.51
 
 ### Patch Changes

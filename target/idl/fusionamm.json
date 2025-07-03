@@ -2,7 +2,7 @@
   "address": "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9",
   "metadata": {
     "name": "fusionamm",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "spec": "0.1.0"
   },
   "instructions": [
@@ -828,7 +828,7 @@
           "type": "u16"
         },
         {
-          "name": "default_clp_to_olp_reward_ratio",
+          "name": "default_clp_reward_rate",
           "type": "u16"
         }
       ]
@@ -1349,29 +1349,29 @@
       ]
     },
     {
-      "name": "set_clp_to_olp_reward_ratio",
+      "name": "set_clp_reward_rate",
       "docs": [
-        "Sets the reward ratio of concentrated liquidity providers to limit orders' liquidity providers.",
+        "Sets the reward rate for concentrated liquidity providers, generated from limit order swaps.",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
         "- \"fee_authority\" - Set authority that can modify pool fees in the FusionPoolConfig",
         "",
         "### Parameters",
-        "- `clp_to_olp_reward_ratio` - The default reward ratio of concentrated liquidity providers to limit orders' liquidity providers",
+        "- `clp_reward_rate` - The default reward ratio of concentrated liquidity providers to limit orders' liquidity providers",
         "",
         "#### Special Errors",
-        "- `ClpToOlpRewardRatioMaxExceeded` - If the provided clp_to_olp_reward_ratio exceeds MAX_CLP_TO_OLP_REWARD_RATIO."
+        "- `ClpRewardRateMaxExceeded` - If the provided clp_reward_rate exceeds MAX_CLP_REWARD_RATE."
       ],
       "discriminator": [
-        209,
-        246,
-        107,
-        185,
-        133,
-        189,
-        221,
-        211
+        76,
+        80,
+        236,
+        123,
+        252,
+        215,
+        183,
+        23
       ],
       "accounts": [
         {
@@ -1388,7 +1388,7 @@
       ],
       "args": [
         {
-          "name": "clp_to_olp_reward_ratio",
+          "name": "clp_reward_rate",
           "type": "u16"
         }
       ]
@@ -1428,30 +1428,30 @@
       "args": []
     },
     {
-      "name": "set_default_clp_to_olp_reward_ratio",
+      "name": "set_default_clp_reward_rate",
       "docs": [
-        "Sets the default reward ratio of concentrated liquidity providers to limit orders' liquidity providers.",
-        "The ratio is represented as basis point. (10000 = 100%)",
+        "Sets the default reward rate for concentrated liquidity providers, generated from limit order swaps.",
+        "The rate is represented as basis point. (10000 = 100%)",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
         "- \"fee_authority\" - Set authority that can modify pool fees in the FusionPoolConfig",
         "",
         "### Parameters",
-        "- `default_clp_to_olp_reward_ratio` - The default reward ratio of concentrated liquidity providers to limit orders' liquidity providers",
+        "- `default_clp_reward_rate` - The default reward ratio of concentrated liquidity providers to limit orders' liquidity providers",
         "",
         "#### Special Errors",
-        "- `ClpToOlpRewardRatioMaxExceeded` - If the provided default_clp_to_olp_reward_ratio exceeds MAX_CLP_TO_OLP_REWARD_RATIO."
+        "- `ClpRewardRateMaxExceeded` - If the provided default_clp_reward_rate exceeds MAX_CLP_REWARD_RATE."
       ],
       "discriminator": [
-        215,
-        242,
-        126,
         149,
-        242,
-        249,
-        226,
-        48
+        56,
+        50,
+        228,
+        161,
+        26,
+        122,
+        145
       ],
       "accounts": [
         {
@@ -1465,7 +1465,7 @@
       ],
       "args": [
         {
-          "name": "default_clp_to_olp_reward_ratio",
+          "name": "default_clp_reward_rate",
           "type": "u16"
         }
       ]
@@ -2354,7 +2354,7 @@
     },
     {
       "code": 6026,
-      "name": "ClpToOlpRewardRatioMaxExceeded",
+      "name": "ClpRewardRateMaxExceeded",
       "msg": "Exceeded reward ratio of concentrated liquidity providers to limit orders' liquidity providers"
     },
     {
@@ -2622,7 +2622,7 @@
             "type": "u16"
           },
           {
-            "name": "clp_to_olp_reward_ratio",
+            "name": "clp_reward_rate",
             "type": "u16"
           },
           {
@@ -2723,7 +2723,7 @@
             "type": "u16"
           },
           {
-            "name": "default_clp_to_olp_reward_ratio",
+            "name": "default_clp_reward_rate",
             "type": "u16"
           },
           {
