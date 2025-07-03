@@ -32,14 +32,11 @@ pub fn limit_order_quote_by_input_token(
     let mut amount_out = get_limit_order_output_amount(amount_in, a_to_b_order, sqrt_price, false)?;
 
     // The total swap fee.
-    let swap_fee = try_reverse_apply_swap_fee(amount_out.into(), fusion_pool.fee_rate)? - amount_out;
-
-    // Calculate the order liquidity provider reward.
-    let mut olp_reward = swap_fee - try_mul_div(swap_fee, fusion_pool.clp_reward_rate as u128, MAX_CLP_REWARD_RATE as u128, false)?;
-    // Subtract the protocol fee from the reward.
-    olp_reward -= try_mul_div(olp_reward, fusion_pool.order_protocol_fee_rate as u128, PROTOCOL_FEE_RATE_MUL_VALUE, false)?;
-
-    amount_out += olp_reward;
+    let mut swap_fee = try_reverse_apply_swap_fee(amount_out.into(), fusion_pool.fee_rate)? - amount_out;
+    // Deduct the protocol fee from the total swap fee.
+    swap_fee -= try_mul_div(swap_fee, fusion_pool.order_protocol_fee_rate as u128, PROTOCOL_FEE_RATE_MUL_VALUE, false)?;
+    // Add the order liquidity provider reward.
+    amount_out += swap_fee - try_mul_div(swap_fee, (MAX_CLP_REWARD_RATE - fusion_pool.clp_reward_rate) as u128, MAX_CLP_REWARD_RATE as u128, false)?;
 
     Ok(amount_out)
 }
@@ -64,8 +61,8 @@ pub fn limit_order_quote_by_output_token(
     let r = fusion_pool.clp_reward_rate as f64 / MAX_CLP_REWARD_RATE as f64;
 
     // Output amount without reward = O
-    // Limit order reward = R = swap_fee⋅(1-r)⋅(1-p) = O⋅f/(1-f)⋅(1-r)⋅(1-p)
-    // Output amount with fees = O' = O + R = O ⋅ (1 + f/(1-f)⋅(1-r)⋅(1-p))
+    // Limit order reward = R = swap_fee⋅(1-p)⋅(1-r) = O⋅f/(1-f)⋅(1-p)⋅(1-r)
+    // Output amount with fees = O' = O + R = O ⋅ (1 + f/(1-f)⋅(1-p)⋅(1-r))
     let denominator = 1.0 + (f / (1.0 - f) * (1.0 - r) * (1.0 - p));
     let amount_out_with_fees = amount_out as f64 / denominator;
 
@@ -372,7 +369,7 @@ mod tests {
         assert_eq!(
             limit_order_quote_by_input_token(10_000, true, price_to_tick_index(2.0, 1, 1), test_fusion_pool(1 << 64, ONE_PCT_FEE_RATE, 0, 0))
                 .unwrap(),
-            20200
+            19998
         );
 
         // 1% swap fee, clp_reward_rate = 50%

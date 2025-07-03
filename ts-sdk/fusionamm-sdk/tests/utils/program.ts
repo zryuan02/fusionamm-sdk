@@ -54,7 +54,7 @@ export async function setupConfig() {
       tokenBadgeAuthority: signer.address,
       defaultProtocolFeeRate: 100,
       defaultOrderProtocolFeeRate: 5000, // 50%
-      defaultClpToOlpRewardRatio: 0, // Everything goes to limit order providers
+      defaultClpRewardRate: 0, // Everything goes to limit order providers
     }),
   );
 

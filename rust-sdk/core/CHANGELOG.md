@@ -1,5 +1,11 @@
 # @crypticdot/fusionamm-rust-core
 
+## 1.0.53
+
+### Patch Changes
+
+- d71dcc0: Updated limit orders fee model
+
 ## 1.0.52
 
 ### Patch Changes
