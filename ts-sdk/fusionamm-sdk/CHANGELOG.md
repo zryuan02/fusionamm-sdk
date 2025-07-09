@@ -1,5 +1,14 @@
 # @crypticdot/fusionamm
 
+## 1.0.54
+
+### Patch Changes
+
+- 2e14bb6: Added the token metadata extension to limit order tokens
+- Updated dependencies [2e14bb6]
+  - @crypticdot/fusionamm-client@1.0.54
+  - @crypticdot/fusionamm-core@1.0.54
+
 ## 1.0.53
 
 ### Patch Changes

@@ -83,7 +83,8 @@ export default class FetchLimitOrder extends BaseCommand {
         : Number(limitOrder.data.amount - quote.amountOutB)) / Number(limitOrder.data.amount);
 
     console.log(
-      `address: ${limitOrder.address}; orderMint: ${limitOrder.data.limitOrderMint}; price: ${price}; size: ${limitOrder.data.amount}; aToB: ${limitOrder.data.aToB}; ` +
+      `address: ${limitOrder.address}; orderMint: ${limitOrder.data.limitOrderMint}; price: ${price}; tickIndex: ${limitOrder.data.tickIndex}; ` +
+        `size: ${limitOrder.data.amount}; aToB: ${limitOrder.data.aToB}; ` +
         `fill: ${Math.round(fill * 100)}%; out: [${quote.amountOutA}; ${quote.amountOutB}]`,
     );
   }

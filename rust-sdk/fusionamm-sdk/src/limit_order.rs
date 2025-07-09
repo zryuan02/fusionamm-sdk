@@ -4,7 +4,7 @@ use crate::{PriceOrTickIndex, FUNDER};
 use fusionamm_client::{
     get_limit_order_address, get_tick_array_address, CloseLimitOrder, DecreaseLimitOrder, DecreaseLimitOrderInstructionArgs, FusionPool,
     IncreaseLimitOrder, IncreaseLimitOrderInstructionArgs, InitializeTickArray, InitializeTickArrayInstructionArgs, LimitOrder, OpenLimitOrder,
-    OpenLimitOrderInstructionArgs, TickArray,
+    OpenLimitOrderInstructionArgs, TickArray, FP_NFT_UPDATE_AUTH,
 };
 use fusionamm_core::{
     decrease_limit_order_quote, get_initializable_tick_index, get_tick_array_start_tick_index, price_to_tick_index, try_reverse_apply_transfer_fee,
@@ -235,8 +235,13 @@ pub async fn open_limit_order_instructions(
             token2022_program: spl_token_2022::ID,
             system_program: solana_program::system_program::id(),
             associated_token_program: spl_associated_token_account::ID,
+            metadata_update_auth: FP_NFT_UPDATE_AUTH,
         }
-        .instruction(OpenLimitOrderInstructionArgs { tick_index, a_to_b }),
+        .instruction(OpenLimitOrderInstructionArgs {
+            tick_index,
+            a_to_b,
+            with_token_metadata_extension: true,
+        }),
     );
 
     instructions.push(

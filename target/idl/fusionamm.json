@@ -2,7 +2,7 @@
   "address": "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9",
   "metadata": {
     "name": "fusionamm",
-    "version": "1.0.3",
+    "version": "1.0.6",
     "spec": "0.1.0"
   },
   "instructions": [
@@ -1210,7 +1210,8 @@
         "",
         "### Parameters",
         "- `tick_index` - The tick specifying the limit order execution price.",
-        "- `a_to_b` - The limit order swap direction."
+        "- `a_to_b` - The limit order swap direction.",
+        "- `with_token_metadata_extension` - If true, the token metadata extension will be initialized."
       ],
       "discriminator": [
         157,
@@ -1255,6 +1256,9 @@
         },
         {
           "name": "associated_token_program"
+        },
+        {
+          "name": "metadata_update_auth"
         }
       ],
       "args": [
@@ -1264,6 +1268,10 @@
         },
         {
           "name": "a_to_b",
+          "type": "bool"
+        },
+        {
+          "name": "with_token_metadata_extension",
           "type": "bool"
         }
       ]

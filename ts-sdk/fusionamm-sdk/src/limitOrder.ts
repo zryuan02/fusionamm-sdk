@@ -13,6 +13,7 @@ import {
   fetchAllMaybeLimitOrder,
   fetchLimitOrder,
   fetchMaybeTickArray,
+  FP_NFT_UPDATE_AUTH,
   getCloseLimitOrderInstruction,
   LimitOrder,
   limitOrderFusionPoolFilter,
@@ -170,8 +171,10 @@ export async function openLimitOrderInstructions(
       fusionPool: fusionPool.address,
       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
       token2022Program: TOKEN_2022_PROGRAM_ADDRESS,
+      metadataUpdateAuth: FP_NFT_UPDATE_AUTH,
       tickIndex: initializableTickIndex,
       aToB,
+      withTokenMetadataExtension: true,
     }),
   );
 

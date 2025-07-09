@@ -1,5 +1,11 @@
 # @crypticdot/fusionamm-rust
 
+## 1.0.54
+
+### Patch Changes
+
+- 2e14bb6: Added the token metadata extension to limit order tokens
+
 ## 1.0.53
 
 ## 1.0.52

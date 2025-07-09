@@ -1,5 +1,13 @@
 # @crypticdot/fusionamm-rust-integration
 
+## 1.0.54
+
+## 1.0.53
+
+## 1.0.52
+
+## 1.0.51
+
 ## 1.0.50
 
 ### Patch Changes
