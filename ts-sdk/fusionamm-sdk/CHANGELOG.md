@@ -1,5 +1,13 @@
 # @crypticdot/fusionamm
 
+## 1.0.55
+
+### Patch Changes
+
+- 4e2357c: Replaced the outdated dependecies
+  - @crypticdot/fusionamm-core@1.0.55
+  - @crypticdot/fusionamm-client@1.0.55
+
 ## 1.0.54
 
 ### Patch Changes
