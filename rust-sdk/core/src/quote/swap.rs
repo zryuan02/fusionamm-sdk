@@ -13,7 +13,7 @@ use crate::{
     try_get_amount_delta_a, try_get_amount_delta_b, try_get_max_amount_with_slippage_tolerance, try_get_min_amount_with_slippage_tolerance,
     try_get_next_sqrt_price_from_a, try_get_next_sqrt_price_from_b, try_mul_div, try_reverse_apply_swap_fee, try_reverse_apply_transfer_fee,
     CoreError, ExactInSwapQuote, ExactOutSwapQuote, FusionPoolFacade, TickArraySequence, TickArrays, TickFacade, TransferFee, AMOUNT_EXCEEDS_MAX_U64,
-    ARITHMETIC_OVERFLOW, FEE_RATE_DENOMINATOR, INVALID_SQRT_PRICE_LIMIT_DIRECTION, MAX_SQRT_PRICE, MIN_SQRT_PRICE, SQRT_PRICE_LIMIT_OUT_OF_BOUNDS,
+    ARITHMETIC_OVERFLOW, FEE_RATE_MUL_VALUE, INVALID_SQRT_PRICE_LIMIT_DIRECTION, MAX_SQRT_PRICE, MIN_SQRT_PRICE, SQRT_PRICE_LIMIT_OUT_OF_BOUNDS,
     ZERO_TRADABLE_AMOUNT,
 };
 
@@ -179,7 +179,7 @@ pub fn compute_swap<const SIZE: usize>(
         return Err(SQRT_PRICE_LIMIT_OUT_OF_BOUNDS);
     }
 
-    if a_to_b && sqrt_price_limit > fusion_pool.sqrt_price || !a_to_b && sqrt_price_limit < fusion_pool.sqrt_price {
+    if a_to_b && sqrt_price_limit >= fusion_pool.sqrt_price || !a_to_b && sqrt_price_limit <= fusion_pool.sqrt_price {
         return Err(INVALID_SQRT_PRICE_LIMIT_DIRECTION);
     }
 
@@ -323,18 +323,18 @@ fn fill_limit_orders(
 
         if amount_specified_is_input {
             // Total possible swap input.
-            result.amount_in = get_limit_order_output_amount(part_filled_orders_remaining_input, !a_to_b, sqrt_price, false)?;
+            result.amount_in = get_limit_order_output_amount(part_filled_orders_remaining_input, !a_to_b, sqrt_price, true)?;
             // The total amount of the limit order input token that can be swapped.
             result.amount_out = part_filled_orders_remaining_input;
             // Swap fee in input token.
-            result.fee_amount = try_mul_div(result.amount_in, fee_rate as u128, FEE_RATE_DENOMINATOR as u128 - fee_rate as u128, true)?;
+            result.fee_amount = try_mul_div(result.amount_in, fee_rate as u128, FEE_RATE_MUL_VALUE as u128 - fee_rate as u128, true)?;
 
             // Not enough input remaining amount to fill all limit orders of the tick.
             if amount_remaining < result.amount_in + result.fee_amount {
                 let total_available_amount_in = result.amount_in;
 
                 // Swap fee in input token.
-                result.fee_amount = try_mul_div(amount_remaining, fee_rate as u128, FEE_RATE_DENOMINATOR as u128, true)?;
+                result.fee_amount = try_mul_div(amount_remaining, fee_rate as u128, FEE_RATE_MUL_VALUE as u128, true)?;
 
                 // Total possible swap input minus fee amount.
                 result.amount_in = amount_remaining - result.fee_amount;
@@ -348,7 +348,7 @@ fn fill_limit_orders(
             result.amount_out = part_filled_orders_remaining_input.min(amount_remaining);
             // Swap input
             result.amount_in = get_limit_order_output_amount(result.amount_out, !a_to_b, sqrt_price, true)?;
-            result.fee_amount = try_mul_div(result.amount_in, fee_rate as u128, FEE_RATE_DENOMINATOR as u128 - fee_rate as u128, true)?;
+            result.fee_amount = try_mul_div(result.amount_in, fee_rate as u128, FEE_RATE_MUL_VALUE as u128 - fee_rate as u128, true)?;
         }
     }
 
@@ -635,8 +635,8 @@ mod tests {
             swap_quote_by_input_token(85000, true, 1000, test_fusion_pool_with_zero_liquidity(1 << 64), test_tick_arrays_with_orders(), None, None)
                 .unwrap();
         assert_eq!(result.token_in, 85000);
-        assert_eq!(result.token_est_out, 84079);
-        assert_eq!(result.token_min_out, 75671);
+        assert_eq!(result.token_est_out, 84072);
+        assert_eq!(result.token_min_out, 75664);
         assert_eq!(result.trade_fee, 858);
         assert_eq!(result.next_sqrt_price, 18431993317065449817);
     }
@@ -661,8 +661,8 @@ mod tests {
             swap_quote_by_input_token(85000, false, 1000, test_fusion_pool_with_zero_liquidity(1 << 64), test_tick_arrays_with_orders(), None, None)
                 .unwrap();
         assert_eq!(result.token_in, 85000);
-        assert_eq!(result.token_est_out, 84062);
-        assert_eq!(result.token_min_out, 75655);
+        assert_eq!(result.token_est_out, 84054);
+        assert_eq!(result.token_min_out, 75648);
         assert_eq!(result.trade_fee, 858);
         assert_eq!(result.next_sqrt_price, 18463352785753515702);
     }

@@ -14,7 +14,7 @@ use fusionamm_macros::wasm_expose;
 
 use crate::{
     try_apply_transfer_fee, CollectFeesQuote, CoreError, FusionPoolFacade, PositionFacade, TickFacade, TransferFee, AMOUNT_EXCEEDS_MAX_U64,
-    ARITHMETIC_OVERFLOW,
+    ARITHMETIC_OVERFLOW, MAX_CLP_REWARD_RATE, MAX_ORDER_PROTOCOL_FEE_RATE,
 };
 
 /// Calculate fees owed for a position
@@ -88,6 +88,15 @@ pub fn collect_fees_quote(
     let fee_owed_b = try_apply_transfer_fee(withdrawable_fee_b, transfer_fee_b.unwrap_or_default())?;
 
     Ok(CollectFeesQuote { fee_owed_a, fee_owed_b })
+}
+
+#[cfg_attr(feature = "wasm", wasm_expose)]
+pub fn limit_order_fee(fusion_pool: FusionPoolFacade) -> i32 {
+    let fee = fusion_pool.fee_rate as u64 * (MAX_ORDER_PROTOCOL_FEE_RATE as u64 - fusion_pool.order_protocol_fee_rate as u64)
+        / MAX_ORDER_PROTOCOL_FEE_RATE as u64
+        * (MAX_CLP_REWARD_RATE as u64 - fusion_pool.clp_reward_rate as u64)
+        / MAX_CLP_REWARD_RATE as u64;
+    -(fee as i32)
 }
 
 #[cfg(all(test, not(feature = "wasm")))]
@@ -207,5 +216,16 @@ mod tests {
         let result = collect_fees_quote(fusion_pool, position, tick_lower, tick_upper, None, None).unwrap();
         assert_eq!(result.fee_owed_a, 58500334);
         assert_eq!(result.fee_owed_b, 334966494);
+    }
+
+    #[test]
+    fn test_limit_order_fee() {
+        let result = limit_order_fee(FusionPoolFacade {
+            fee_rate: 10000,
+            order_protocol_fee_rate: MAX_ORDER_PROTOCOL_FEE_RATE / 2,
+            clp_reward_rate: MAX_CLP_REWARD_RATE / 2,
+            ..FusionPoolFacade::default()
+        });
+        assert_eq!(result, -2500);
     }
 }

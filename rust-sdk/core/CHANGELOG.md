@@ -1,5 +1,13 @@
 # @crypticdot/fusionamm-rust-core
 
+## 1.0.56
+
+### Patch Changes
+
+- 4abedb0: Added limit order fees calculation
+
+## 1.0.55
+
 ## 1.0.54
 
 ## 1.0.53

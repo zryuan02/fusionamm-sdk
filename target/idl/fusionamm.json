@@ -2,7 +2,7 @@
   "address": "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9",
   "metadata": {
     "name": "fusionamm",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "spec": "0.1.0"
   },
   "instructions": [
@@ -258,7 +258,8 @@
           "name": "fusion_pools_config"
         },
         {
-          "name": "fusion_pool"
+          "name": "fusion_pool",
+          "writable": true
         },
         {
           "name": "collect_protocol_fees_authority",
@@ -2523,7 +2524,7 @@
     {
       "code": 6058,
       "name": "TakerOrderNotSupported",
-      "msg": "The limit order tick index is incorrect relative to the current market tick (tacker order)"
+      "msg": "The limit order tick index is incorrect relative to the current market tick (taker order)"
     },
     {
       "code": 6059,
@@ -2539,6 +2540,11 @@
       "code": 6061,
       "name": "LimitOrderIsFilled",
       "msg": "Unable to increase a limit order because it's partially or fully filled"
+    },
+    {
+      "code": 6062,
+      "name": "ZeroAmount",
+      "msg": "Zero amount"
     }
   ],
   "types": [

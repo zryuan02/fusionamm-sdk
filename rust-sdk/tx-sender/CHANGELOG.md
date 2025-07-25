@@ -1,5 +1,11 @@
 # @crypticdot/fusionamm-rust-tx-sender
 
+## 1.0.10
+
+### Patch Changes
+
+- d43f7ed: Added margin multiplier to SmartTxConfig, added SmartTxResult
+
 ## 1.0.9
 
 ### Patch Changes

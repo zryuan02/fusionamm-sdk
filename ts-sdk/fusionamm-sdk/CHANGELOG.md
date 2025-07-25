@@ -1,5 +1,12 @@
 # @crypticdot/fusionamm
 
+## 1.0.56
+
+### Patch Changes
+
+- @crypticdot/fusionamm-core@1.0.56
+- @crypticdot/fusionamm-client@1.0.56
+
 ## 1.0.55
 
 ### Patch Changes

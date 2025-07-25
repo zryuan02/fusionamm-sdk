@@ -13,18 +13,21 @@
 #[cfg(feature = "wasm")]
 use fusionamm_macros::wasm_expose;
 
-/// The denominator of the fee rate value.
 #[cfg_attr(feature = "wasm", wasm_expose)]
-pub const FEE_RATE_DENOMINATOR: u32 = 1_000_000;
+pub const FEE_RATE_MUL_VALUE: u32 = 1_000_000;
 
-// TODO: WASM export (which doesn't work with u128 yet)
+#[cfg_attr(feature = "wasm", wasm_expose)]
+pub const MAX_PROTOCOL_FEE_RATE: u16 = 2_500;
 
-/// The minimum sqrt price for a fusion_pool.
-pub const MIN_SQRT_PRICE: u128 = 4295048016;
+#[cfg_attr(feature = "wasm", wasm_expose)]
+pub const MAX_ORDER_PROTOCOL_FEE_RATE: u16 = 10_000;
 
-/// The maximum sqrt price for a fusion_pool.
-pub const MAX_SQRT_PRICE: u128 = 79226673515401279992447579055;
-
+#[cfg_attr(feature = "wasm", wasm_expose)]
 pub const MAX_CLP_REWARD_RATE: u16 = 10_000;
 
-pub const PROTOCOL_FEE_RATE_MUL_VALUE: u128 = 10_000;
+#[cfg_attr(feature = "wasm", wasm_expose)]
+pub const PROTOCOL_FEE_RATE_MUL_VALUE: u16 = 10_000;
+
+// TODO: WASM export (which doesn't work with u128 yet)
+pub const MIN_SQRT_PRICE: u128 = 4295048016;
+pub const MAX_SQRT_PRICE: u128 = 79226673515401279992447579055;

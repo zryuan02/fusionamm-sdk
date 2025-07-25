@@ -9,7 +9,7 @@
 //
 
 use crate::{
-    CoreError, TransferFee, AMOUNT_EXCEEDS_MAX_U64, ARITHMETIC_OVERFLOW, BPS_DENOMINATOR, FEE_RATE_DENOMINATOR, INVALID_SLIPPAGE_TOLERANCE,
+    CoreError, TransferFee, AMOUNT_EXCEEDS_MAX_U64, ARITHMETIC_OVERFLOW, BPS_DENOMINATOR, FEE_RATE_MUL_VALUE, INVALID_SLIPPAGE_TOLERANCE,
     INVALID_TRANSFER_FEE, MAX_SQRT_PRICE, MIN_SQRT_PRICE, SQRT_PRICE_OUT_OF_BOUNDS, U128,
 };
 
@@ -276,8 +276,8 @@ pub fn try_get_min_amount_with_slippage_tolerance(amount: u64, slippage_toleranc
 /// - `u64`: The amount after the fee has been applied
 #[cfg_attr(feature = "wasm", wasm_expose)]
 pub fn try_apply_swap_fee(amount: u64, fee_rate: u16) -> Result<u64, CoreError> {
-    let product = <u128>::from(FEE_RATE_DENOMINATOR) - <u128>::from(fee_rate);
-    let result = try_mul_div(amount, product, FEE_RATE_DENOMINATOR.into(), false)?;
+    let product = <u128>::from(FEE_RATE_MUL_VALUE) - <u128>::from(fee_rate);
+    let result = try_mul_div(amount, product, FEE_RATE_MUL_VALUE.into(), false)?;
     Ok(result)
 }
 
@@ -293,8 +293,8 @@ pub fn try_apply_swap_fee(amount: u64, fee_rate: u16) -> Result<u64, CoreError> 
 /// - `u64`: The amount before the fee has been applied
 #[cfg_attr(feature = "wasm", wasm_expose)]
 pub fn try_reverse_apply_swap_fee(amount: u64, fee_rate: u16) -> Result<u64, CoreError> {
-    let denominator = <u128>::from(FEE_RATE_DENOMINATOR) - <u128>::from(fee_rate);
-    let result = try_mul_div(amount, FEE_RATE_DENOMINATOR.into(), denominator, true)?;
+    let denominator = <u128>::from(FEE_RATE_MUL_VALUE) - <u128>::from(fee_rate);
+    let result = try_mul_div(amount, FEE_RATE_MUL_VALUE.into(), denominator, true)?;
     Ok(result)
 }
 

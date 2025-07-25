@@ -39,7 +39,6 @@
   "devDependencies": {
     "@crypticdot/eslint-config": "^1.0.0",
     "@crypticdot/prettier-config": "^1.0.0",
-    "@solana/kit": "^2.1.0",
     "tsup": "^8.4.0",
     "typescript": "^5.7.3"
   }

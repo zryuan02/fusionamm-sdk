@@ -18,3 +18,4 @@ export * from "./limitOrder";
 export * from "./pool";
 export * from "./position";
 export * from "./swap";
+export * from "./collectProtocolFees";

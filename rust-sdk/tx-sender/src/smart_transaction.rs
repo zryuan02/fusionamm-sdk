@@ -36,6 +36,7 @@ use tokio::time::sleep;
 
 const MAX_COMPUTE_UNIT_LIMIT: u32 = 1_400_000;
 const DEFAULT_TRANSACTION_TIMEOUT_SECONDS: u64 = 60;
+const DEFAULT_COMPUTE_UNIT_MARGIN_MULTIPLIER: f64 = 1.15;
 
 #[derive(Clone)]
 pub struct SmartTxConfig {
@@ -43,6 +44,7 @@ pub struct SmartTxConfig {
     pub jito: Option<SmartTxJitoConfig>,
     /// This value is only used if estimation fails.
     pub default_compute_unit_limit: u32,
+    pub compute_unit_margin_multiplier: f64,
     pub ingore_simulation_error: bool,
     pub sig_verify_on_simulation: bool,
     /// The default timeout is 60 seconds.
@@ -55,6 +57,7 @@ impl Default for SmartTxConfig {
             priority_fee: None,
             jito: None,
             default_compute_unit_limit: MAX_COMPUTE_UNIT_LIMIT,
+            compute_unit_margin_multiplier: DEFAULT_COMPUTE_UNIT_MARGIN_MULTIPLIER,
             ingore_simulation_error: false,
             sig_verify_on_simulation: true,
             transaction_timeout: None,
@@ -75,6 +78,16 @@ pub struct SmartTxJitoConfig {
     pub uuid: String,
     pub tips: u64,
     pub region: Option<String>,
+}
+
+#[derive(Clone)]
+pub struct SmartTxResult {
+    /// The transaction signature.
+    pub signature: String,
+    /// Used priority fee (micro lamports per compute unit).
+    pub priority_fee: u64,
+    /// Jito bundle id if the transaction has been sent via Jito.
+    pub jito_bundle_id: Option<String>,
 }
 
 #[allow(clippy::enum_variant_names)]
@@ -100,7 +113,7 @@ pub async fn send_smart_transaction(
     instructions: Vec<Instruction>,
     lookup_tables: Vec<AddressLookupTableAccount>,
     tx_config: SmartTxConfig,
-) -> Result<(String, u64, Option<String>), SmartTransactionError> {
+) -> Result<SmartTxResult, SmartTransactionError> {
     let transaction_timeout = tx_config
         .transaction_timeout
         .unwrap_or_else(|| Duration::from_secs(DEFAULT_TRANSACTION_TIMEOUT_SECONDS));
@@ -157,8 +170,8 @@ pub async fn send_smart_transaction(
 
                 let cu_consumed = response.value.units_consumed.unwrap_or(0);
 
-                // Add 15% to the consumed compute units.
-                cu_limit = u32::min(MAX_COMPUTE_UNIT_LIMIT, (cu_consumed as u32) * 150 / 100);
+                // Add margin to the consumed compute units during the simulation.
+                cu_limit = u32::min(MAX_COMPUTE_UNIT_LIMIT, (cu_consumed as f64 * tx_config.compute_unit_margin_multiplier.clamp(1.0, 10.0)) as u32);
                 break;
             }
             Err(_) => {
@@ -203,16 +216,20 @@ pub async fn send_smart_transaction(
 
         // Send the transaction as Jito bundle.
         let jito_client = Client::new();
-        let bundle_id = send_jito_bundle(jito_client.clone(), vec![transaction_base58], &jito_api_url)
+        let jito_bundle_id = send_jito_bundle(jito_client.clone(), vec![transaction_base58], &jito_api_url)
             .await
             .map_err(|e| SmartTransactionError::JitoClientError(e.to_string()))?;
 
         // Wait for the confirmation.
-        let signature = poll_jito_bundle_statuses(jito_client.clone(), bundle_id.clone(), &jito_api_url, transaction_timeout)
+        let signature = poll_jito_bundle_statuses(jito_client.clone(), jito_bundle_id.clone(), &jito_api_url, transaction_timeout)
             .await
             .map_err(|e| SmartTransactionError::JitoClientError(e.to_string()))?;
 
-        Ok((signature, priority_fee, Some(bundle_id)))
+        Ok(SmartTxResult {
+            signature,
+            priority_fee,
+            jito_bundle_id: Some(jito_bundle_id),
+        })
     } else {
         let send_config = RpcSendTransactionConfig {
             skip_preflight: true,
@@ -227,7 +244,11 @@ pub async fn send_smart_transaction(
         // Wait for the confirmation.
         poll_transaction_confirmation(client, signature, transaction_timeout).await?;
 
-        Ok((signature.to_string(), priority_fee, None))
+        Ok(SmartTxResult {
+            signature: signature.to_string(),
+            priority_fee,
+            jito_bundle_id: None,
+        })
     }
 }
 

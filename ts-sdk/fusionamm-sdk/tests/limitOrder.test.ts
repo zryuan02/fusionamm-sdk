@@ -230,8 +230,8 @@ describe("Limit Orders", () => {
       expect(fusionPool.data.ordersTotalAmountA).toEqual(8000000n);
       expect(fusionPool.data.ordersTotalAmountB).toEqual(8000000n);
 
-      expect(fusionPool.data.ordersFilledAmountA).toEqual(poolName == "A-TEFee" ? 4380691n : 4422475n);
-      expect(fusionPool.data.ordersFilledAmountB).toEqual(4876390n);
+      expect(fusionPool.data.ordersFilledAmountA).toEqual(poolName == "A-TEFee" ? 4380687n : 4422472n);
+      expect(fusionPool.data.ordersFilledAmountB).toEqual(4876385n);
       expect(fusionPool.data.olpFeeOwedA).toEqual(754n);
       expect(fusionPool.data.olpFeeOwedB).toEqual(poolName == "A-TEFee" ? 746n : 753n);
 
@@ -253,8 +253,8 @@ describe("Limit Orders", () => {
 
       const poolVaultA = await fetchToken(rpc, fusionPool.data.tokenVaultA);
       const poolVaultB = await fetchToken(rpc, fusionPool.data.tokenVaultB);
-      expect(poolVaultA.data.amount - fusionPool.data.protocolFeeOwedA).toEqual(6n);
-      expect(poolVaultB.data.amount - fusionPool.data.protocolFeeOwedB).toEqual(6n);
+      expect(poolVaultA.data.amount - fusionPool.data.protocolFeeOwedA).toEqual(11n);
+      expect(poolVaultB.data.amount - fusionPool.data.protocolFeeOwedB).toEqual(poolName == "A-TEFee" ? 10n : 9n);
     });
   }
 });

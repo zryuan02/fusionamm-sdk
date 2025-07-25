@@ -8,7 +8,7 @@
 use crate::math::get_limit_order_output_amount;
 use crate::{
     tick_index_to_sqrt_price, try_apply_transfer_fee, try_mul_div, try_reverse_apply_swap_fee, CoreError, FusionPoolFacade, LimitOrderDecreaseQuote,
-    LimitOrderFacade, TickFacade, TransferFee, AMOUNT_EXCEEDS_LIMIT_ORDER_INPUT_AMOUNT, AMOUNT_EXCEEDS_MAX_U64, FEE_RATE_DENOMINATOR,
+    LimitOrderFacade, TickFacade, TransferFee, AMOUNT_EXCEEDS_LIMIT_ORDER_INPUT_AMOUNT, AMOUNT_EXCEEDS_MAX_U64, FEE_RATE_MUL_VALUE,
     LIMIT_ORDER_AND_POOL_ARE_OUT_OF_SYNC, MAX_CLP_REWARD_RATE, PROTOCOL_FEE_RATE_MUL_VALUE,
 };
 
@@ -34,7 +34,7 @@ pub fn limit_order_quote_by_input_token(
     // The total swap fee.
     let mut swap_fee = try_reverse_apply_swap_fee(amount_out.into(), fusion_pool.fee_rate)? - amount_out;
     // Deduct the protocol fee from the total swap fee.
-    swap_fee -= try_mul_div(swap_fee, fusion_pool.order_protocol_fee_rate as u128, PROTOCOL_FEE_RATE_MUL_VALUE, false)?;
+    swap_fee -= try_mul_div(swap_fee, fusion_pool.order_protocol_fee_rate as u128, PROTOCOL_FEE_RATE_MUL_VALUE as u128, false)?;
     // Add the order liquidity provider reward.
     amount_out += swap_fee - try_mul_div(swap_fee, (MAX_CLP_REWARD_RATE - fusion_pool.clp_reward_rate) as u128, MAX_CLP_REWARD_RATE as u128, false)?;
 
@@ -56,7 +56,7 @@ pub fn limit_order_quote_by_output_token(
 ) -> Result<u64, CoreError> {
     let sqrt_price: u128 = tick_index_to_sqrt_price(tick_index).into();
 
-    let f = fusion_pool.fee_rate as f64 / FEE_RATE_DENOMINATOR as f64;
+    let f = fusion_pool.fee_rate as f64 / FEE_RATE_MUL_VALUE as f64;
     let p = fusion_pool.order_protocol_fee_rate as f64 / PROTOCOL_FEE_RATE_MUL_VALUE as f64;
     let r = fusion_pool.clp_reward_rate as f64 / MAX_CLP_REWARD_RATE as f64;
 
