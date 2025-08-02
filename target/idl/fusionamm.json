@@ -2,7 +2,7 @@
   "address": "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9",
   "metadata": {
     "name": "fusionamm",
-    "version": "1.0.8",
+    "version": "1.0.10",
     "spec": "0.1.0"
   },
   "instructions": [
@@ -1358,6 +1358,58 @@
       ]
     },
     {
+      "name": "reset_pool_price",
+      "docs": [
+        "Resets the pool price to the provided value if the pool is empty.",
+        "",
+        "### Authority",
+        "- \"fee_authority\" - Set authority that can modify pool fees in the FusionPoolConfig",
+        "",
+        "### Parameters",
+        "- `sqrt_price` - The new sqrt_price of the pool.",
+        "",
+        "#### Special Errors",
+        "- `ResetPriceForNonEmptyPool` - Thrown if the pool is not empty."
+      ],
+      "discriminator": [
+        93,
+        158,
+        158,
+        189,
+        131,
+        42,
+        15,
+        22
+      ],
+      "accounts": [
+        {
+          "name": "fee_authority",
+          "signer": true
+        },
+        {
+          "name": "fusion_pools_config"
+        },
+        {
+          "name": "token_vault_a",
+          "writable": true
+        },
+        {
+          "name": "token_vault_b",
+          "writable": true
+        },
+        {
+          "name": "fusion_pool",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "sqrt_price",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "set_clp_reward_rate",
       "docs": [
         "Sets the reward rate for concentrated liquidity providers, generated from limit order swaps.",
@@ -2545,6 +2597,11 @@
       "code": 6062,
       "name": "ZeroAmount",
       "msg": "Zero amount"
+    },
+    {
+      "code": 6063,
+      "name": "ResetPriceForNonEmptyPool",
+      "msg": "Can't reset the price because a pool is not empty"
     }
   ],
   "types": [

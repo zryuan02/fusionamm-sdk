@@ -10,16 +10,30 @@
 
 import { findAssociatedTokenPda } from "@solana-program/token";
 import { describe, it, beforeAll, expect } from "vitest";
-import { closeLimitOrderInstructions, openLimitOrderInstructions, swapInstructions } from "../src";
+import {
+  closeLimitOrderInstructions,
+  harvestPositionInstructions,
+  openLimitOrderInstructions,
+  openPositionInstructions,
+  PriceOrTickIndex,
+  swapInstructions,
+} from "../src";
 import { rpc, signer, sendTransaction } from "./utils/mockRpc";
 import { setupMint, setupAta } from "./utils/token";
-import { fetchFusionPool, fetchLimitOrder, getLimitOrderAddress } from "@crypticdot/fusionamm-client";
+import {
+  fetchFusionPool,
+  fetchLimitOrder,
+  fetchTickArray,
+  FusionPool,
+  getLimitOrderAddress,
+  getTickArrayAddress,
+} from "@crypticdot/fusionamm-client";
 import { fetchAllMint, fetchMint, fetchToken } from "@solana-program/token-2022";
-import type { Address, KeyPairSigner } from "@solana/kit";
+import { Account, Address, KeyPairSigner } from "@solana/kit";
 import assert from "assert";
 import { setupFusionPool } from "./utils/program";
 import { setupAtaTE, setupMintTE, setupMintTEFee } from "./utils/tokenExtensions";
-import { sqrtPriceToPrice } from "@crypticdot/fusionamm-core";
+import { getTickArrayStartTickIndex, sqrtPriceToPrice } from "@crypticdot/fusionamm-core";
 
 const mintTypes = new Map([
   ["A", setupMint],
@@ -44,14 +58,24 @@ describe("Limit Orders", () => {
 
   beforeAll(async () => {});
 
+  const fetchAndLogTickByTickIndex = async (fusionPool: Account<FusionPool>, tickIndex: number) => {
+    const tickArrayStartIndex = getTickArrayStartTickIndex(tickIndex, fusionPool.data.tickSpacing);
+    const tickArrayAddress = (await getTickArrayAddress(fusionPool.address, tickArrayStartIndex))[0];
+    const tickArray = await fetchTickArray(rpc, tickArrayAddress);
+    console.log(
+      `TICK ${tickIndex}: `,
+      tickArray.data.ticks[(tickIndex - tickArrayStartIndex) / fusionPool.data.tickSpacing],
+    );
+  };
+
   const testOpenLimitOrder = async (args: {
     poolAddress: Address;
     amount: bigint;
-    price: number;
+    priceOrTickIndex: PriceOrTickIndex;
     aToB: boolean;
     signer?: KeyPairSigner;
   }) => {
-    const { amount, price, aToB, poolAddress } = args;
+    const { amount, priceOrTickIndex, aToB, poolAddress } = args;
     const owner = args.signer ?? signer;
 
     let fusionPool = await fetchFusionPool(rpc, poolAddress);
@@ -76,7 +100,7 @@ describe("Limit Orders", () => {
       rpc,
       poolAddress,
       amount,
-      { price },
+      priceOrTickIndex,
       aToB,
     );
 
@@ -166,7 +190,7 @@ describe("Limit Orders", () => {
         orders.push(
           await testOpenLimitOrder({
             ...args,
-            price: currentPrice + args.priceOffset,
+            priceOrTickIndex: { price: currentPrice + args.priceOffset },
             poolAddress,
             signer,
           }),
@@ -209,7 +233,7 @@ describe("Limit Orders", () => {
         orders.push(
           await testOpenLimitOrder({
             ...args,
-            price: currentPrice + args.priceOffset,
+            priceOrTickIndex: { price: currentPrice + args.priceOffset },
             poolAddress,
             signer,
           }),
@@ -257,4 +281,90 @@ describe("Limit Orders", () => {
       expect(poolVaultB.data.amount - fusionPool.data.protocolFeeOwedB).toEqual(poolName == "A-TEFee" ? 10n : 9n);
     });
   }
+
+  it(`Open a position on a tick initialized by the limit order`, async () => {
+    const setupMintA = mintTypes.get("A")!;
+    const setupMintB = mintTypes.get("B")!;
+    const setupAtaA = ataTypes.get("A")!;
+    const setupAtaB = ataTypes.get("B")!;
+
+    const mintAAddress = await setupMintA();
+    const mintBAddress = await setupMintB();
+    const mintA = await fetchMint(rpc, mintAAddress);
+    const mintB = await fetchMint(rpc, mintBAddress);
+    const ataAAddress = await setupAtaA(mintAAddress, { amount: 100_000_000n });
+    const ataBAddress = await setupAtaB(mintBAddress, { amount: 100_000_000n });
+    const poolAddress = await setupFusionPool(mintAAddress, mintBAddress, tickSpacing);
+
+    // let fusionPool = await fetchFusionPool(rpc, poolAddress);
+    // let price = sqrtPriceToPrice(fusionPool.data.sqrtPrice, mintA.data.decimals, mintB.data.decimals);
+    // console.log(`1: tick = ${fusionPool.data.tickCurrentIndex}, price = ${price}`);
+
+    await testOpenLimitOrder({
+      amount: 500_000n,
+      aToB: false,
+      priceOrTickIndex: { tickIndex: -256 },
+      poolAddress,
+      signer,
+    });
+
+    const innerPositionIx = await openPositionInstructions(
+      rpc,
+      poolAddress,
+      { tokenA: 1_000_000n },
+      { tickIndex: -128 },
+      { tickIndex: 128 },
+    );
+    await sendTransaction(innerPositionIx.instructions);
+
+    // Generate fees inside the inner position
+    await testSwapExactInput({ poolAddress, inputAmount: 700_000n, mint: mintBAddress });
+    await testSwapExactInput({ poolAddress, inputAmount: 700_000n, mint: mintAAddress });
+
+    //fusionPool = await fetchFusionPool(rpc, poolAddress);
+    //price = sqrtPriceToPrice(fusionPool.data.sqrtPrice, mintA.data.decimals, mintB.data.decimals);
+    //console.log(`2: tick = ${fusionPool.data.tickCurrentIndex}, price = ${price}`);
+
+    //console.log("BEFORE OPENING OUTER");
+    //await fetchAndLogTickByTickIndex(fusionPool, -256);
+
+    // Open the outer position
+    const outerPositionIx = await openPositionInstructions(
+      rpc,
+      poolAddress,
+      { tokenA: 1_000_000n },
+      { tickIndex: -256 },
+      { tickIndex: 256 },
+    );
+    await sendTransaction(outerPositionIx.instructions);
+
+    //console.log("AFTER OPENING OUTER");
+    //await fetchAndLogTickByTickIndex(fusionPool, -256);
+
+    //const positionAddress = (await getPositionAddress(outerPositionIx.positionMint))[0];
+    //const position = await fetchPosition(rpc, positionAddress);
+    //console.log("position =", position);
+
+    // Generate fees
+    await testSwapExactInput({ poolAddress, inputAmount: 1400_000n, mint: mintBAddress });
+    await testSwapExactInput({ poolAddress, inputAmount: 300_000n, mint: mintAAddress });
+
+    // fusionPool = await fetchFusionPool(rpc, poolAddress);
+    // price = sqrtPriceToPrice(fusionPool.data.sqrtPrice, mintA.data.decimals, mintB.data.decimals);
+    // console.log(`4: tick = ${fusionPool.data.tickCurrentIndex}, price = ${price}`);
+
+    const tokenABefore = await fetchToken(rpc, ataAAddress);
+    const tokenBBefore = await fetchToken(rpc, ataBAddress);
+
+    const harvestIx = await harvestPositionInstructions(rpc, outerPositionIx.positionMint);
+    //console.log("Fees = ", harvestIx.feesQuote);
+    await sendTransaction(harvestIx.instructions);
+
+    const tokenAAfter = await fetchToken(rpc, ataAAddress);
+    const tokenBAfter = await fetchToken(rpc, ataBAddress);
+    expect(harvestIx.feesQuote.feeOwedA).equals(30n);
+    expect(harvestIx.feesQuote.feeOwedB).equals(138n);
+    expect(harvestIx.feesQuote.feeOwedA).equals(tokenAAfter.data.amount - tokenABefore.data.amount);
+    expect(harvestIx.feesQuote.feeOwedB).equals(tokenBAfter.data.amount - tokenBBefore.data.amount);
+  });
 });

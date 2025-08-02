@@ -1,5 +1,7 @@
 # @crypticdot/fusionamm-rust-core
 
+## 1.0.57
+
 ## 1.0.56
 
 ### Patch Changes
