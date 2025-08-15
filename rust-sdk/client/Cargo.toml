@@ -21,18 +21,18 @@ solana-v1 = []
 
 [dependencies]
 # Solana
-solana-client = { version = "^2.2" }
-solana-account-decoder = { version = "^2.2" }
-solana-account = { version = "^2.2" }
-solana-program = { version = "^2.2" }
-solana-pubkey = { version = "^2.2" }
-solana-program-entrypoint = { version = "^2.2" }
-solana-decode-error = { version = "^2.2" }
-solana-program-error = { version = "^2.2" }
-solana-msg = { version = "^2.2" }
-solana-instruction = { version = "^2.2" }
-solana-cpi = { version = "^2.2" }
-solana-account-info = { version = "^2.2" }
+solana-client = { version = "2.2.0" }
+solana-account-decoder = { version = "2.2.0" }
+solana-account = { version = "2.2.0" }
+solana-program = { version = "2.2.0" }
+solana-pubkey = { version = "2.2.0" }
+solana-program-entrypoint = { version = "2.2.0" }
+solana-decode-error = { version = "2.2.0" }
+solana-program-error = { version = "2.2.0" }
+solana-msg = { version = "2.2.0" }
+solana-instruction = { version = "2.2.0" }
+solana-cpi = { version = "2.2.0" }
+solana-account-info = { version = "2.2.0" }
 
 # Anchor
 anchor-lang = { version = ">=0.28, <0.32", optional = true }
