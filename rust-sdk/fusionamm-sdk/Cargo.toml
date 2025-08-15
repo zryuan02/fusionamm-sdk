@@ -19,16 +19,16 @@ fusionamm-core = { path = "../core", features = ["floats"] }
 fusionamm-client = { path = "../client", features = ["fetch"] }
 
 # Solana
-solana-client = { version = "^2.2" }
-solana-account-decoder = { version = "^2.2" }
-solana-account = { version = "^2.2" }
-solana-program = { version = "^2.2" }
-solana-pubkey = { version = "^2.2" }
-solana-keypair = { version = "^2.2" }
-solana-signer = { version = "^2.2" }
-solana-program-error = { version = "^2.2" }
-solana-instruction = { version = "^2.2" }
-solana-sdk-ids = { version = "^2.2" }
+solana-client = { version = "2.2.0" }
+solana-account-decoder = { version = "2.2.0" }
+solana-account = { version = "2.2.0" }
+solana-program = { version = "2.2.0" }
+solana-pubkey = { version = "2.2.0" }
+solana-keypair = { version = "2.2.0" }
+solana-signer = { version = "2.2.0" }
+solana-program-error = { version = "2.2.0" }
+solana-instruction = { version = "2.2.0" }
+solana-sdk-ids = { version = "2.2.0" }
 
 # Spl token
 spl-token = { version = ">=3.0, <9.0", features = ["no-entrypoint"] }
